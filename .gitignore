@@ -1,0 +1,9 @@
+*~
+.DS_Store
+.idea/
+*.log
+*.pyc
+*.swp
+/data/
+sync.sh
+web/img/story/

@@ -1,0 +1,61 @@
+.message {
+  position: absolute;
+  left: 0;
+  top: 40%;
+  font-size: 30px;
+  width: 100%;
+  text-align: center;
+}
+
+.date_axis {
+  height: 42px;
+  z-index: 2;
+  border-top-width: 0;
+  border-bottom: 1px solid black;
+  border-left-width: 0;
+  border-right: 1px solid black;
+}
+
+.plot_container {
+  border: 0 !important;
+}
+
+.value_and_time {
+  position: absolute;
+  display: none;
+  right: 56px;
+  top: 42px;
+  background-color: rgba(255, 255, 255, 1);
+  margin: 2px;
+  padding: 2px;
+  font-size: 15px;
+  line-height: 15px;
+}
+
+.y_axis {
+  position: relative;
+  width: 50px;
+  border-bottom-width: 0;
+  border-left: 1px solid black;
+  border-right-width: 0;
+  border-top: 1px solid black;
+}
+
+.y_axis_label {
+  position: absolute;
+  right: 2px;
+  top: 10px;
+  background-color: rgba(255, 255, 255, 1);
+  margin: 2px;
+  padding: 2px;
+  font-size: 15px;
+  line-height: 15px;
+}
+
+.value {
+  display: inline;
+}
+
+.time {
+  display: inline;
+}

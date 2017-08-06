@@ -1,0 +1,87 @@
+.viz-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.viz-map-home-btn {
+  position: absolute !important;
+  font-size: 12px !important;
+  left: 10px !important;
+  top: 112px !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: none;
+}
+
+.viz-map-legend {
+  position: absolute;
+  font-size: 13px;
+  right: 9px;
+  bottom: 24px;
+  outline: none;
+  background-color: rgba(255, 255, 255, 1);
+  border: 1px solid #777777;
+  border-radius: 2px;
+  border-spacing: 10px;
+  display: none;
+  width: 212px;
+  padding-top: 1px;
+}
+
+.viz-map-legend-color-td {
+  color: black;
+  opacity: 1;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  border-radius: 20px;
+}
+
+.viz-map-legend-color-txt {
+  text-align: left;
+}
+
+.viz-map-legend-color-yellow {
+  background-color: #ffff00;
+  border: 1px solid #cbcb00;
+}
+
+.viz-map-legend-color-green {
+  background-color: #27ff31;
+  border: 1px solid #448847;
+}
+
+.viz-map-devices-select {
+  width: 105px;
+  font-size: 13px;
+  font-family: 'Raleway', Helvetica, Arial, sans-serif;
+}
+
+.viz-map-custom-button {
+  background-image: none !important;
+  background: white !important;
+  color: black !important;
+  font-family: 'Raleway', Helvetica, Arial, sans-serif !important;
+  outline: none !important;
+  border-radius: 2px !important;
+  border: 1px solid #dddddd !important;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px !important;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px !important;
+}
+
+.viz-map-custom-button:hover {
+  border: 1px solid #dddddd !important;
+}
+
+a {
+  color: inherit;
+}
+
+.cell-pad {
+  text-align: center;
+  padding-bottom: 2px;
+  padding-top: 2px;
+  padding-right: 0px;
+  padding-left: 15px;
+}
