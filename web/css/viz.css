@@ -1,6 +1,6 @@
 .viz-map-container {
   position: absolute;
-  left: 0;
+  left: 450px;
   right: 0;
   bottom: 170px;
   top: 0;
@@ -9,28 +9,42 @@
   overflow-x: hidden;
   overflow-y: hidden;
   border-bottom: 1px solid #666666;
+  border-left: 1px solid #666666;
 }
 
 .viz-speck-chart-container {
   position: absolute;
-  left: 0;
+  left: 450px;
   right: 0;
   bottom: 0;
   height: 170px;
   width: auto;
   overflow-x: scroll;
   overflow-y: hidden;
+  border-left: 1px solid #666666;
 }
 
 .viz-health-chart-container {
   position: absolute;
-  left: 0;
+  left: 450px;
   right: 0;
   bottom: 0;
   height: 170px;
   width: auto;
   overflow-x: scroll;
   overflow-y: hidden;
+  border-left: 1px solid #666666;
+}
+
+.viz-story-scroller-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 450px;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .viz-slideshow-outer-container {

@@ -1,0 +1,35 @@
+.story-scroller {
+  position: relative;
+  margin: 20px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.story-scroller .story-scroller-title {
+  font-size: 24px;
+  font-family: 'Open Sans', sans-serif;
+  text-align: justify;
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.story-scroller .story-scroller-image {
+  position: relative;
+  width: 100%;
+  border: 1px solid #666666;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.story-scroller .story-scroller-text {
+  font-size: 13px;
+  font-family: 'Open Sans', sans-serif;
+  text-align: justify;
+  margin-top: 10px;
+  margin-bottom: 0;
+}

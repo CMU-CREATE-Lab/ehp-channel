@@ -120,7 +120,7 @@
 
       // Add stories
       var root_url = "https://drive.google.com/uc?export=view&id=";
-      addSlideshow([
+      addStoryScroller([
         /*"img/story/image3.png",
          "img/story/image3.png",
          "img/story/image18.png",
@@ -133,7 +133,7 @@
          "img/story/image5.png",
          "img/story/image4.png",
          "img/story/image11.png"*/
-        root_url + "0B--829ypPJ_MUHNMcjI2VWVWOVk",
+        null,
         root_url + "0B--829ypPJ_MUHNMcjI2VWVWOVk",
         root_url + "0B--829ypPJ_MN3lfbkdYLXV0TVk",
         root_url + "0B--829ypPJ_MUFVITjBQcmdVVG8",
@@ -432,7 +432,7 @@
       };
 
       function renderChart(desired_type, desired_dimension_settings) {
-        var w = $container.width();
+        var w = $(chart_selector).width();
         var options = chart_settings[desired_type];
         var chart_min_width = typeof options["chart_min_width"] === "undefined" ? 800 : options["chart_min_width"];
         var line_alpha = typeof options["line_alpha"] === "undefined" ? 0.4 : options["line_alpha"];
@@ -539,6 +539,37 @@
           return v;
         };
       }
+    }
+
+    function addStoryScroller(sources, captions, latlng) {
+      var story_scroller_class = "viz-story-scroller-container";
+      var story_scroller_selector = "#" + container_id + " ." + story_scroller_class;
+
+      // Add to DOM
+      $container.append($('<div class="' + story_scroller_class + '"></div>'));
+
+      // Add object
+      var story_scroller = new edaplotjs.StoryScroller(story_scroller_selector, {
+        sources: sources,
+        captions: captions
+      });
+
+      // Add a book marker on the Google map
+      var google_map = geo_heatmap.getGoogleMap();
+      var marker = new google.maps.Marker({
+        position: latlng,
+        map: google_map,
+        //title: "title",
+        icon: {
+          url: "img/book.png",
+          scaledSize: new google.maps.Size(30, 30),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(0, 25)
+        }
+      });
+      marker.addListener("click", function () {
+        // Scroll page
+      });
     }
 
     function addSlideshow(sources, captions, latlng) {
