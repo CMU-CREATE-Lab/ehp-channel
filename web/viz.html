@@ -4,7 +4,6 @@
   <title>Environmental Health Channel</title>
   <link href="lib/geo-heatmap/GeoHeatmap.css" media="screen" rel="stylesheet" type="text/css"/>
   <link href="lib/slideshow/Slideshow.css" media="screen" rel="stylesheet" type="text/css"/>
-  <link href="lib/story-scroller/StoryScroller.css" media="screen" rel="stylesheet" type="text/css"/>
   <link href="lib/color-scale-legend/ColorScaleLegend.css" media="screen" rel="stylesheet" type="text/css"/>
   <link href="css/viz.css" media="screen" rel="stylesheet" type="text/css"/>
   <link href="lib/parallel-coordinates/d3.parcoords.css" media="screen" rel="stylesheet" type="text/css"/>
@@ -21,7 +20,7 @@
   <script src="lib/parallel-coordinates/d3.underscore.math.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjw_fWbWxQ8tTjn_R6S90HqwYCocSoYcI"></script>
   <script src="lib/geo-heatmap/GeoHeatmap.js" type="text/javascript"></script>
-  <script src="lib/story-scroller/StoryScroller.js" type="text/javascript"></script>
+  <script src="lib/slideshow/Slideshow.js" type="text/javascript"></script>
   <script src="lib/color-scale-legend/ColorScaleLegend.js" type="text/javascript"></script>
   <script src="js/util.js" type="text/javascript"></script>
   <script src="js/viz.js" type="text/javascript"></script>
@@ -104,6 +103,12 @@
           data["health_data_group_by_zipcode"] = json;
         }).fail(function (response) {
           console.log("server error when loading health_data_group_by_zipcode.json:", response);
+        }),
+        // Load the story data
+        $.getJSON(path + "story_data.json", function (json) {
+          data["story_data"] = json;
+        }).fail(function (response) {
+          console.log("server error when loading story_data.json:", response);
         })
       ).then(function () {
         init(data);
@@ -119,7 +124,8 @@
         speck_data: data["speck_data"],
         health_data: data["health_data"],
         speck_data_group_by_zipcode: data["speck_data_group_by_zipcode"],
-        health_data_group_by_zipcode: data["health_data_group_by_zipcode"]
+        health_data_group_by_zipcode: data["health_data_group_by_zipcode"],
+        story_data: data["story_data"]
       });
     }
 

@@ -18,11 +18,14 @@ def generateLogger(file_name, **options):
     return logging.getLogger(__name__)
 
 # Convert string to float in a safe way
-def str2float(string):
+def str2float(string, **options):
     try:
         return float(string)
     except ValueError:
-        return None
+        if "default_value" in options:
+            return options["default_value"]
+        else:
+            return None
 
 # Return a list of all files in a folder
 def getAllFileNamesInFolder(file_path):

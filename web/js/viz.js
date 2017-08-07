@@ -41,6 +41,7 @@
       speck: undefined,
       health: undefined
     };
+    var slideshow = [];
 
     // This table maps zipcodes and aggregated Speck (or health) analysis data
     var analysis_aggr_by_zipcode = {
@@ -51,7 +52,8 @@
     // Main data tables
     var data = {
       speck: settings["speck_data"],
-      health: settings["health_data"]
+      health: settings["health_data"],
+      story: settings["story_data"]
     };
 
     // Data tables grouped by zipcode
@@ -119,46 +121,7 @@
       addAnalysisChart("health", mode !== "health");
 
       // Add stories
-      var root_url = "https://drive.google.com/uc?export=view&id=";
-      addStoryScroller([
-        /*"img/story/image3.png",
-         "img/story/image3.png",
-         "img/story/image18.png",
-         "img/story/image6.png",
-         "img/story/image1.png",
-         "img/story/image8.png",
-         "img/story/image15.png",
-         "img/story/image17.png",
-         "img/story/image14.png",
-         "img/story/image5.png",
-         "img/story/image4.png",
-         "img/story/image11.png"*/
-        null,
-        root_url + "0B--829ypPJ_MUHNMcjI2VWVWOVk",
-        root_url + "0B--829ypPJ_MN3lfbkdYLXV0TVk",
-        root_url + "0B--829ypPJ_MUFVITjBQcmdVVG8",
-        root_url + "0B--829ypPJ_MSjQ5S1B0WTZ0NGs",
-        root_url + "0B--829ypPJ_MQkdWTmd6RUduaEk",
-        root_url + "0B--829ypPJ_MUS1zWGJ1Qk42ZVU",
-        root_url + "0B--829ypPJ_Memhna2RLVWJWdVE",
-        root_url + "0B--829ypPJ_McDVIbWpqMzIxOUE",
-        root_url + "0B--829ypPJ_MTE5Xakx5b1UzRDA",
-        root_url + "0B--829ypPJ_MOEp0b1AwcDBMbjg",
-        root_url + "0B--829ypPJ_McXFKWlZXVmFtM2M"
-      ], [
-        "Jack and Darlene have deep roots and a rich history where they live. They are taking an active role in that evolving history of this rural community, by monitoring the impacts of natural gas development that surrounds their home.",
-        "Their property is nestled at the base of hills. From this view, you can see the auto mechanic shop Jack runs. On this beautiful summer day, it is easy to forget that the home sits near an active compressor station and impoundment ponds.",
-        "The family dog, Gizmo, poses on the front porch beside two unopened Speck air quality monitors. This 32-day period of air monitoring will be at least the second Jack and Darlene have participated in.",
-        "Jack and Darlene chose not to contribute photographs of themselves to this story. Instead, they generously shared rich details from their family history, including funny childhood stories and proud accounts of US military service, demonstrated by memorabilia and photographs around their home.",
-        "Jack and Darlene's property is beautiful and unique. Tucked in the woods behind their home is a natural spring: an invaluable natural resource. However, they fear that this water is contaminated, due to earlier mining in the hills above the water source, and the more recent gas drilling activity in the area.",
-        "Each feature that Jack and Darlene point out has a fascinating history. Throughout its years, his small outbuilding, within view of the porch and mechanic shop, has served as a chicken coop, a barber shop, and a play area for their daughter. It now stores her old toys, which Darlene can't bear to part with.",
-        "On the hill behind the outbuilding sit several dead trees of assorted varieties. Jack and Darlene observed that shortly after Rice Energy did a 'blow off' at the compressor station further uphill, these trees began to die.",
-        "The Blue Moon compressor station hums away, within earshot of Jack and Darlene's home.",
-        "An impoundment pond sits about a mile from their home. They are not sure whether this pond holds fresh water for nearby fracking operations or wastewater from them.",
-        "Jack knows the history of this area, and is acutely attuned to any changes. This development of a new compressor station, however, is hard to miss.",
-        "The couple positions the air monitors indoors and out. From their prior experience with these devices, they know to situate the monitor away from the kitchen, where cooking releases smoke and gases that can give high readings.",
-        "The couple feels relieved that a planned buyout of local driller should halt new drilling for a rumored two year period. A new gas facility was planned for the hillside directly above their home. As this story evolves, Jack and Darlene will monitor the changes in their community and their environment."
-      ], {lat: 40.16, lng: -80.24});
+      addStory();
 
       // Handle shared urls
       handleHashChange();
@@ -541,88 +504,68 @@
       }
     }
 
-    function addStoryScroller(sources, captions, latlng) {
-      var story_scroller_class = "viz-story-scroller-container";
-      var story_scroller_selector = "#" + container_id + " ." + story_scroller_class;
-
-      // Add to DOM
-      $container.append($('<div class="' + story_scroller_class + '"></div>'));
-
-      // Add object
-      var story_scroller = new edaplotjs.StoryScroller(story_scroller_selector, {
-        sources: sources,
-        captions: captions
-      });
-
-      // Add a book marker on the Google map
-      var google_map = geo_heatmap.getGoogleMap();
-      var marker = new google.maps.Marker({
-        position: latlng,
-        map: google_map,
-        //title: "title",
-        icon: {
-          url: "img/book.png",
-          scaledSize: new google.maps.Size(30, 30),
-          origin: new google.maps.Point(0, 0),
-          anchor: new google.maps.Point(0, 25)
-        }
-      });
-      marker.addListener("click", function () {
-        // Scroll page
-      });
-    }
-
-    function addSlideshow(sources, captions, latlng) {
+    function addStory() {
+      // Add DOM
+      var slideshow_inner_class = "viz-slideshow-inner-container";
       var slideshow_outer_mask_class = "viz-slideshow-outer-mask";
       var slideshow_outer_class = "viz-slideshow-outer-container";
-      var slideshow_inner_class = "viz-slideshow-inner-container";
-      var slideshow_inner_selector = "#" + container_id + " ." + slideshow_inner_class;
-
-      // Add to DOM
-      var $slideshow_outer = $('<div class="' + slideshow_outer_class + '"><div class="' + slideshow_inner_class + '"></div></div>');
+      var $slideshow_inner = $('<div class="' + slideshow_inner_class + '"></div>');
+      var $slideshow_outer = $('<div class="' + slideshow_outer_class + '"></div>');
       var $slideshow_outer_mask = $('<div class="' + slideshow_outer_mask_class + '"></div>');
+      $slideshow_outer.append($slideshow_inner);
       $container.append($slideshow_outer);
       $container.append($slideshow_outer_mask);
 
-      // Add object
-      var slideshow = new edaplotjs.Slideshow(slideshow_inner_selector, {
-        sources: sources,
-        captions: captions,
-        slideshow_close_callback: function () {
-          $slideshow_outer.hide();
-          $slideshow_outer_mask.hide();
-        },
-        slideshow_open_callback: function () {
-          $slideshow_outer.show();
-          $slideshow_outer_mask.show();
-        }
-      });
-      $slideshow_outer.hide();
-      $slideshow_outer_mask.hide();
+      // Add slideshows
+      for (var i = 0; i < data["story"].length; i++) {
+        // Add object
+        slideshow[i] = new edaplotjs.Slideshow({
+          title: data["story"][i]["title"],
+          slide: data["story"][i]["slide"],
+          slideshow_close_callback: onSlideshowClose,
+          slideshow_open_callback: onSlideshowOpen
+        });
+        onSlideshowClose();
 
-      // Add a book marker on the Google map
-      var google_map = geo_heatmap.getGoogleMap();
-      var marker = new google.maps.Marker({
-        position: latlng,
-        map: google_map,
-        //title: "title",
-        icon: {
-          url: "img/book.png",
-          scaledSize: new google.maps.Size(30, 30),
-          origin: new google.maps.Point(0, 0),
-          anchor: new google.maps.Point(0, 25)
-        }
-      });
-      marker.addListener("click", function () {
-        slideshow.open();
-      });
+        // Add a book marker on the Google map
+        var google_map = geo_heatmap.getGoogleMap();
+        var marker = new google.maps.Marker({
+          position: {lat: data["story"][i]["latitude"], lng: data["story"][i]["longitude"]},
+          map: google_map,
+          title: data["title"],
+          icon: {
+            url: "img/book.png",
+            scaledSize: new google.maps.Size(30, 30),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(0, 25)
+          },
+          slideshow_index: i
+        });
+        var slideshow_inner_selector = "#" + container_id + " ." + slideshow_inner_class;
+        marker.addListener("click", function () {
+          slideshow[this["slideshow_index"]].open(slideshow_inner_selector);
+        });
+      }
+
+      function onSlideshowClose() {
+        $slideshow_outer.hide();
+        $slideshow_outer_mask.hide();
+      }
+
+      function onSlideshowOpen() {
+        $slideshow_outer.show();
+        $slideshow_outer_mask.show();
+      }
     }
 
     function handleHashChange() {
       var unsafe_hash = util.getUnsafeHashString().match(/#(.+)/);
       if (unsafe_hash) {
         var unsafe_hash_obj = util.unpackVars(unsafe_hash[1]);
-        var selected_zipcode = unsafe_hash_obj["selected_zipcode"];
+        var slideshow_idx = unsafe_hash_obj["slideshow"];
+        if (typeof slideshow[slideshow_idx] !== "undefined") {
+          slideshow[slideshow_idx].open("#" + container_id + " .viz-slideshow-inner-container");
+        }
       }
     }
 

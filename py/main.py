@@ -6,7 +6,7 @@ from speckNameToHealthId import *
 from createDeviceInfoTable import *
 from createHealthInfoTable import *
 
-from mergeDeivceAndHealthData import *
+from processData import *
 from createZipcodeGeoJson import *
 from createZipcodeBoundInfo import *
 
@@ -50,17 +50,18 @@ def main(argv):
     # Build the health information table
     fpath_in = p+"health/health.xlsx"
     fpath_out = p+"result/health.csv"
-    createHealthInfoTable(fpath_in, fpath_out)
+    #createHealthInfoTable(fpath_in, fpath_out)
 
     ############################################################################################
     #### All the above code is for uploading Speck data and creating tables on Google sheet ####
     ############################################################################################
 
-    # Merge device and health table
+    # Process data
     # Generate files for visualization
     fpath_in = [
         "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=0",
-        "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=1153620501"
+        "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=1153620501",
+        "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=2061228022"
     ]
     fpath_out = [
         p+"result/speck_median_aggr_by_zipcode.json",
@@ -68,9 +69,10 @@ def main(argv):
         p+"result/speck_data.json",
         p+"result/health_data.json",
         p+"result/speck_data_group_by_zipcode.json",
-        p+"result/health_data_group_by_zipcode.json"
+        p+"result/health_data_group_by_zipcode.json",
+        p+"result/story_data.json"
     ]
-    mergeDeivceAndHealthData(fpath_in, fpath_out)
+    processData(fpath_in, fpath_out)
 
     # Read the GeoJSON containing all US zipcode boundaries
     # Read the table that maps Speck ID and zipcode

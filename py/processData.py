@@ -2,9 +2,8 @@ from util import *
 import pandas as pd
 import json
 
-# Merge zipcode device table and zipcode health table
-# Merge device statistics table and health statistics table
-def mergeDeivceAndHealthData(fpath_in, fpath_out):
+# Process all data provided by EHP to json files
+def processData(fpath_in, fpath_out):
     logger = generateLogger("log.log")
     logger.info("=====================================================================")
     logger.info("=============== START merging device and health data ================")
@@ -14,29 +13,31 @@ def mergeDeivceAndHealthData(fpath_in, fpath_out):
     df_s = pd.read_csv(fpath_in[0])
     logger.info("Read health information: " + fpath_in[1])
     df_h = pd.read_csv(fpath_in[1])
+    logger.info("Read story information: " + fpath_in[2])
+    df_st = pd.read_csv(fpath_in[2])
 
     # Clean up health code
     df_s["health code"] = df_s["health code"].str.strip(" ,")
     df_h["health code"] = df_h["health code"].str.strip(" ,")
 
     # Save Speck data
-    df_s.drop(["speck name", "zipcode", "health code"], axis=1).to_json(fpath_out[2], orient="records")
+    df_s.drop(["speck name", "zipcode", "health code", "year", "month", "day"], axis=1).to_json(fpath_out[2], orient="records")
 
     # Compute and save median of Speck analysis for each zipcode
-    df_s_gp = df_s.groupby(["zipcode"])
+    df_s_gp = df_s.drop(["speck name", "health code", "year", "month", "day"], axis=1).groupby(["zipcode"])
     df_s_median = df_s_gp.median()
     df_s_median["size"] = df_s_gp.size()
-    df_s_median = df_s_median[df_s_median["size"] >= 3] # smaple size need > 3
+    df_s_median = df_s_median[df_s_median["size"] >= 3] # sample size need > 3
     df_s_median.round(2).to_json(fpath_out[0], orient="columns")
 
     # Group and save Speck data by zipcode
     data_s_gp = {}
     for key, item in df_s_gp:
-        data_s_gp[key] = json.loads(item.drop(["zipcode", "health code"], axis=1).to_json(orient="records"))
+        data_s_gp[key] = json.loads(item.drop(["zipcode"], axis=1).to_json(orient="records"))
     saveJson(data_s_gp, fpath_out[4])
 
     # Compute percentage of having the symptom for each zipcode
-    df_h_gp = df_h.groupby(["zipcode"])
+    df_h_gp = df_h.drop(["health code", "year", "month", "day"], axis=1).groupby(["zipcode"])
     df_h_sum = df_h_gp.sum()
     df_h_size = df_h_gp.size()
     df_h_percent = df_h_sum.divide(df_h_size, axis=0)
@@ -44,7 +45,7 @@ def mergeDeivceAndHealthData(fpath_in, fpath_out):
     df_h_percent = df_h_percent[df_h_percent["size"] >= 3] # sample size need > 3
     
     # Add percentage of having the symptom for entire dataset
-    df_h_percent_all = df_h.sum().drop(["zipcode", "health code"]).divide(len(df_h))
+    df_h_percent_all = df_h.sum().drop(["zipcode", "health code", "year", "month", "day"]).divide(len(df_h))
     df_h_percent_all["size"] = len(df_h)
     df_h_percent_all.name = "all"
     df_h_percent = df_h_percent.append(df_h_percent_all)
@@ -57,6 +58,32 @@ def mergeDeivceAndHealthData(fpath_in, fpath_out):
     for idx, row in df_h_percent.iterrows():
         df_h_percent_gp[idx] = [json.loads(row.to_json(orient="columns"))]
     saveJson(df_h_percent_gp, fpath_out[5])
+
+    # Process and save story information
+    data_st = []
+    df_st_gp = df_st.groupby(["story id"])
+    for key, item in df_st_gp:
+        story = {
+            "latitude": None,
+            "longitude": None,
+            "title": None,
+            "slide": []
+        }
+        for idx, row in item.iterrows():
+            ct = row["content type"]
+            if ct == "slide":
+                story["slide"].append({
+                    "image": row.get("source1"),
+                    "text": removeNonAsciiChars(row.get("source2"))
+                })
+            elif ct == "latitude":
+                story["latitude"] = str2float(row.get("source1"))
+            elif ct == "longitude":
+                story["longitude"] = str2float(row.get("source1"))
+            elif ct == "title":
+                story["title"] = removeNonAsciiChars(row.get("source1"))
+        data_st.append(story)
+    saveJson(data_st, fpath_out[6])
 
     # Compute and save histogram of data
     #saveJson(formatHistogram(df_h), fpath_out[3])
