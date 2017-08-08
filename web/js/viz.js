@@ -18,6 +18,7 @@
     //
     var highlighted_zipcode;
     var mode = "speck"; // "speck" means using speck data, "health" means using health data
+    var current_slideshow_index;
 
     // For normalization
     var max_percentile = 0.95; // using quantile instead of max value when normalizing data
@@ -512,9 +513,11 @@
       var $slideshow_inner = $('<div class="' + slideshow_inner_class + '"></div>');
       var $slideshow_outer = $('<div class="' + slideshow_outer_class + '"></div>');
       var $slideshow_outer_mask = $('<div class="' + slideshow_outer_mask_class + '"></div>');
+      var $slideshow_close = $('<div class="viz-slideshow-close" title="Close slideshow"></div>');
       $slideshow_outer.append($slideshow_inner);
       $container.append($slideshow_outer);
       $container.append($slideshow_outer_mask);
+      $slideshow_outer.append($slideshow_close);
 
       // Add slideshows
       for (var i = 0; i < data["story"].length; i++) {
@@ -544,8 +547,14 @@
         var slideshow_inner_selector = "#" + container_id + " ." + slideshow_inner_class;
         marker.addListener("click", function () {
           slideshow[this["slideshow_index"]].open(slideshow_inner_selector);
+          current_slideshow_index = this["slideshow_index"];
         });
       }
+
+      $slideshow_close.on("click", function() {
+        slideshow[current_slideshow_index].close();
+        current_slideshow_index = undefined;
+      });
 
       function onSlideshowClose() {
         $slideshow_outer.hide();
@@ -565,6 +574,7 @@
         var slideshow_idx = unsafe_hash_obj["slideshow"];
         if (typeof slideshow[slideshow_idx] !== "undefined") {
           slideshow[slideshow_idx].open("#" + container_id + " .viz-slideshow-inner-container");
+          current_slideshow_index = slideshow_idx;
         }
       }
     }

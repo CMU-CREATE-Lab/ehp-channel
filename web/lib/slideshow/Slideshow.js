@@ -52,7 +52,6 @@
       $slideshow_caption = $('<div class="slideshow-caption"></div>');
       $slideshow_left_arrow = $('<div class="slideshow-left-arrow slideshow-arrow"></div>');
       $slideshow_right_arrow = $('<div class="slideshow-right-arrow slideshow-arrow"></div>');
-      var $slideshow_close = $('<div class="slideshow-close"></div>');
 
       // Add structure
       $slideshow_caption_container.append($slideshow_caption);
@@ -60,7 +59,6 @@
       $slideshow.append($slideshow_caption_container);
       $slideshow.append($slideshow_left_arrow);
       $slideshow.append($slideshow_right_arrow);
-      $slideshow.append($slideshow_close);
 
       // Add listeners
       $slideshow_left_arrow.on("click", function () {
@@ -68,9 +66,6 @@
       });
       $slideshow_right_arrow.on("click", function () {
         setSlide(current_slide_idx + 1);
-      });
-      $slideshow_close.on("click", function () {
-        close();
       });
     }
 
