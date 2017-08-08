@@ -96,8 +96,8 @@ a {
   font-family: 'Raleway', Helvetica, Arial, sans-serif;
   font-weight: 300;
   line-height: 1.5;
-  padding-bottom: 5px;
-  padding-top: 5px;
+  padding-bottom: 20px;
+  padding-top: 20px;
 }
 
 #content a {
@@ -129,7 +129,7 @@ a {
 }
 
 .text {
-  margin: 25px 0 25px 0;
+  margin: 5px 0 5px 0;
   padding: 0;
 }
 
@@ -145,6 +145,44 @@ a {
 
 .force-scroll {
   overflow-y: scroll;
+}
+
+.image-viz {
+  background-image: url(../img/viz.png);
+  background-size: 380px 241px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.image-story {
+  background-image: url(../img/story.png);
+  background-size: 380px 241px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.image-button {
+  position: relative;
+  display: block;
+  width: 380px;
+  height: 241px;
+  border: 1px solid #666666;
+  margin: 15px 0 5px 0;
+  padding: 0;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.image-button:hover {
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.8);
+  border: 1px solid #212121;
+}
+
+.image-button-caption {
+  width: 380px;
+  text-align: center;
+  margin: 0 0 15px 0;
+  padding: 0;
+  font-size: 14px;
 }
 
 .custom-button {
@@ -200,8 +238,8 @@ h2 {
   height: 450px;
   border: 1px solid #000000;
   display: flex;
-  margin-top: 30px;
-  margin-bottom: 30px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .force-no-scroll {
