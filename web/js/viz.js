@@ -528,10 +528,11 @@
           slideshow_close_callback: onSlideshowClose,
           slideshow_open_callback: onSlideshowOpen
         });
-        onSlideshowClose();
+        //onSlideshowClose();
 
         // Add a book marker on the Google map
         var google_map = geo_heatmap.getGoogleMap();
+        if (typeof google === "undefined") return;
         var marker = new google.maps.Marker({
           position: {lat: data["story"][i]["latitude"], lng: data["story"][i]["longitude"]},
           map: google_map,

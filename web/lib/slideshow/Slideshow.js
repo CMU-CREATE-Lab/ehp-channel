@@ -16,8 +16,9 @@
     var slideshow_open_callback = settings["slideshow_open_callback"];
     var $slideshow_image, $slideshow_image_loading, $slideshow_image_error;
     var $slideshow, $slideshow_caption, $slideshow_left_arrow, $slideshow_right_arrow;
+    var $slideshow_navigation;
+    var $slideshow_navigation_items = new Array(slide.length);
     var current_slide_idx = 0;
-    var previous_slide_idx = 0;
     var images_cache = new Array(slide.length);
     var setSlideTimeout = null;
 
@@ -52,6 +53,7 @@
       $slideshow_caption = $('<div class="slideshow-caption"></div>');
       $slideshow_left_arrow = $('<div class="slideshow-left-arrow slideshow-arrow"></div>');
       $slideshow_right_arrow = $('<div class="slideshow-right-arrow slideshow-arrow"></div>');
+      $slideshow_navigation = $('<div class="slideshow-navigation"></div>');
 
       // Add structure
       $slideshow_caption_container.append($slideshow_caption);
@@ -59,6 +61,7 @@
       $slideshow.append($slideshow_caption_container);
       $slideshow.append($slideshow_left_arrow);
       $slideshow.append($slideshow_right_arrow);
+      $slideshow.append($slideshow_navigation);
 
       // Add listeners
       $slideshow_left_arrow.on("click", function () {
@@ -67,6 +70,16 @@
       $slideshow_right_arrow.on("click", function () {
         setSlide(current_slide_idx + 1);
       });
+
+      // Add navigation
+      for (var i = 0; i < slide.length; i++) {
+        var $navigation_item = $('<div class="slideshow-navigation-item" data-index="' + i + '"></div>');
+        $slideshow_navigation.append($navigation_item);
+        $navigation_item.on("click", function () {
+          setSlide($(this).data("index"));
+        });
+        $slideshow_navigation_items[i] = $navigation_item;
+      }
     }
 
     function setSlide(desired_slide_idx) {
@@ -91,10 +104,13 @@
         }
       }
 
+      // Handle the navigation items
+      $slideshow_navigation_items[current_slide_idx].removeClass("slideshow-navigation-item-selected");
+      $slideshow_navigation_items[desired_slide_idx].addClass("slideshow-navigation-item-selected");
+
       // Replace image and text
       setImage(desired_slide_idx);
       setCaption(desired_slide_idx);
-      previous_slide_idx = current_slide_idx;
       current_slide_idx = desired_slide_idx;
     }
 

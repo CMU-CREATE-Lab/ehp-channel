@@ -109,6 +109,7 @@
     // Private methods
     //
     function init() {
+      if (typeof google === "undefined") return;
       addMap();
       addZipcodeBoundaries();
     }
