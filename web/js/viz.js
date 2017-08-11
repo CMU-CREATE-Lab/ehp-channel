@@ -528,7 +528,7 @@
           slideshow_close_callback: onSlideshowClose,
           slideshow_open_callback: onSlideshowOpen
         });
-        //onSlideshowClose();
+        onSlideshowClose();
 
         // Add a book marker on the Google map
         var google_map = geo_heatmap.getGoogleMap();
