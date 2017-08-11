@@ -56,12 +56,12 @@
       $slideshow_navigation = $('<div class="slideshow-navigation"></div>');
 
       // Add structure
+      $slideshow.append($slideshow_navigation);
       $slideshow_caption_container.append($slideshow_caption);
       $slideshow.append($slideshow_image);
       $slideshow.append($slideshow_caption_container);
       $slideshow.append($slideshow_left_arrow);
       $slideshow.append($slideshow_right_arrow);
-      $slideshow.append($slideshow_navigation);
 
       // Add listeners
       $slideshow_left_arrow.on("click", function () {
@@ -72,13 +72,15 @@
       });
 
       // Add navigation
-      for (var i = 0; i < slide.length; i++) {
-        var $navigation_item = $('<div class="slideshow-navigation-item" data-index="' + i + '"></div>');
-        $slideshow_navigation.append($navigation_item);
-        $navigation_item.on("click", function () {
-          setSlide($(this).data("index"));
-        });
-        $slideshow_navigation_items[i] = $navigation_item;
+      if (slide.length > 1) {
+        for (var i = 0; i < slide.length; i++) {
+          var $navigation_item = $('<div class="slideshow-navigation-item" data-index="' + i + '"></div>');
+          $slideshow_navigation.append($navigation_item);
+          $navigation_item.on("click", function () {
+            setSlide($(this).data("index"));
+          });
+          $slideshow_navigation_items[i] = $navigation_item;
+        }
       }
     }
 
@@ -105,8 +107,10 @@
       }
 
       // Handle the navigation items
-      $slideshow_navigation_items[current_slide_idx].removeClass("slideshow-navigation-item-selected");
-      $slideshow_navigation_items[desired_slide_idx].addClass("slideshow-navigation-item-selected");
+      if (slide.length > 1) {
+        $slideshow_navigation_items[current_slide_idx].removeClass("slideshow-navigation-item-selected");
+        $slideshow_navigation_items[desired_slide_idx].addClass("slideshow-navigation-item-selected");
+      }
 
       // Replace image and text
       setImage(desired_slide_idx);
@@ -134,7 +138,11 @@
     }
 
     function setCaption(desired_slide_idx) {
-      $slideshow_caption.text(slide[desired_slide_idx]["text"]);
+      if (desired_slide_idx === 0) {
+        $slideshow_caption.html("<h2>" + title + "</h2>" + slide[desired_slide_idx]["text"])
+      } else {
+        $slideshow_caption.text(slide[desired_slide_idx]["text"]);
+      }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
