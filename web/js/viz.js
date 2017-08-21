@@ -72,7 +72,7 @@
     // Set selected dimensions
     var selected_dimension = {
       speck: "Peaks per day",
-      health: "stress/anxiety"
+      health: "Stress/anxiety"
     };
 
     // Dimension settings
@@ -85,8 +85,8 @@
     var chart_settings = {
       speck: {
         chart_min_width: 600,
-        margin_left: 0,
-        margin_right: 0,
+        margin_left: 10,
+        margin_right: 10,
         wrap_label_width: 100,
         line_alpha: 0.4,
         line_alpha_on_brushed: 0.15,
@@ -95,8 +95,8 @@
       },
       health: {
         chart_min_width: 1200,
-        margin_left: 20,
-        margin_right: 5,
+        margin_left: 10,
+        margin_right: 10,
         wrap_label_width: 60,
         line_alpha: 0.8,
         line_alpha_on_brushed: 0.15,
@@ -309,7 +309,7 @@
 
       // Parameters
       var margin_top = 15;
-      var margin_bottom = 40;
+      var margin_bottom = 50;
       var chart_height = $(chart_selector).height();
       var options = chart_settings[type];
       var margin_left = typeof options["margin_left"] === "undefined" ? 0 : options["margin_left"];

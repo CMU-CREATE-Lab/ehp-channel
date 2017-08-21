@@ -18,7 +18,7 @@
   bottom: 0;
   height: 170px;
   width: auto;
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: hidden;
 }
 
@@ -29,9 +29,8 @@
   bottom: 0;
   height: 170px;
   width: auto;
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: hidden;
-
 }
 
 .viz-slideshow-outer-container {
@@ -45,8 +44,8 @@
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 10;
   display: flex;
-  overflow-x: scroll;
-  overflow-y: scroll;
+  overflow-x: auto;
+  overflow-y: auto;
   border-bottom: 1px solid transparent;
 }
 
@@ -75,7 +74,7 @@
 
 .viz-slideshow-close {
   display: inline-block;
-  position: absolute;
+  position: fixed;
   top: 10px;
   right: 10px;
   z-index: 11;
@@ -177,7 +176,7 @@ a {
 
 .info-window-content {
   max-height: 178px;
-  overflow-y: scroll !important;
+  overflow-y: auto !important;
 }
 
 .gm-style-iw {

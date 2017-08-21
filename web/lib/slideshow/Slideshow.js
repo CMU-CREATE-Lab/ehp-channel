@@ -56,8 +56,8 @@
       $slideshow_navigation = $('<div class="slideshow-navigation"></div>');
 
       // Add structure
-      $slideshow.append($slideshow_navigation);
       $slideshow_caption_container.append($slideshow_caption);
+      $slideshow_caption_container.append($slideshow_navigation);
       $slideshow.append($slideshow_image);
       $slideshow.append($slideshow_caption_container);
       $slideshow.append($slideshow_left_arrow);
