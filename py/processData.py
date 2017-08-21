@@ -74,14 +74,14 @@ def processData(fpath_in, fpath_out):
             if ct == "slide":
                 story["slide"].append({
                     "image": row.get("source1"),
-                    "text": removeNonAsciiChars(row.get("source2"))
+                    "text": row.get("source2")
                 })
             elif ct == "latitude":
                 story["latitude"] = str2float(row.get("source1"))
             elif ct == "longitude":
                 story["longitude"] = str2float(row.get("source1"))
             elif ct == "title":
-                story["title"] = removeNonAsciiChars(row.get("source1"))
+                story["title"] = row.get("source1")
         data_st.append(story)
     saveJson(data_st, fpath_out[6])
 

@@ -5,7 +5,7 @@
  * Dependencies: jQuery (http://jquery.com/)
  * Contact: hsu.yenchia@gmail.com
  * License: GNU General Public License v2
- * Version: v1.10
+ * Version: v1.11
  *************************************************************************/
 
 (function () {
@@ -145,7 +145,8 @@
           position: google.maps.ControlPosition.LEFT_TOP
         },
         scaleControl: true,
-        clickableIcons: false
+        clickableIcons: false,
+        gestureHandling: "greedy"
       });
     }
 
