@@ -1,15 +1,15 @@
 #image-viz {
   background-image: url(../img/viz.png);
-  background-size: 380px 240px;
-  height: 240px;
-  width: 380px;
+  background-size: 430px 270px;
+  height: 270px;
+  width: 430px;
 }
 
 #image-story {
   background-image: url(../img/story.png);
-  background-size: 380px 240px;
-  height: 240px;
-  width: 380px;
+  background-size: 430px 270px;
+  height: 270px;
+  width: 430px;
 }
 
 .box {
