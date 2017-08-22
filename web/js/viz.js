@@ -84,7 +84,7 @@
     // Chart settings
     var chart_settings = {
       speck: {
-        chart_min_width: 600,
+        chart_min_width: 800,
         margin_left: 10,
         margin_right: 10,
         wrap_label_width: 100,
@@ -94,8 +94,8 @@
         axis_font_size: "12px"
       },
       health: {
-        chart_min_width: 1200,
-        margin_left: 10,
+        chart_min_width: 1100,
+        margin_left: 15,
         margin_right: 10,
         wrap_label_width: 60,
         line_alpha: 0.8,
@@ -401,7 +401,11 @@
         var chart_min_width = typeof options["chart_min_width"] === "undefined" ? 800 : options["chart_min_width"];
         var line_alpha = typeof options["line_alpha"] === "undefined" ? 0.4 : options["line_alpha"];
         var line_alpha_on_brushed = typeof options["line_alpha_on_brushed"] === "undefined" ? 0.25 : options["line_alpha_on_brushed"];
-        var desired_chart_width = w > chart_min_width ? w : chart_min_width;
+        var desired_chart_width = w;
+
+        if (w < chart_min_width) {
+          desired_chart_width = chart_min_width;
+        }
 
         chart[desired_type].width(desired_chart_width);
         chart[desired_type].dimensions(desired_dimension_settings)
@@ -552,7 +556,7 @@
         });
       }
 
-      $slideshow_close.on("click", function() {
+      $slideshow_close.on("click", function () {
         slideshow[current_slideshow_index].close();
         current_slideshow_index = undefined;
       });

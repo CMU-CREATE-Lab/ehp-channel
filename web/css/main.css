@@ -1,9 +1,9 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
   background-color: white;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  min-width: 840px;
 }
 
 a {
@@ -13,31 +13,28 @@ a {
 
 #menu-container {
   z-index: 2;
-  position: fixed;
-  top: 0;
+  position: relative;
   width: 100%;
-  text-align: center;
   background-color: #212121;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.15), 0 3px 7px rgba(0, 0, 0, 0.3);
 }
 
 #menu {
   position: relative;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 0;
-  width: 800px;
-  text-align: center;
-  padding-top: 10px;
-  padding-bottom: 40px;
+  margin: 0 auto;
+  max-width: 840px;
+}
+
+#menu-table {
+  padding: 0 20px;
+  width: 100%;
+  margin: 0;
+  height: 50px;
 }
 
 #logo {
   font-family: 'Open Sans Condensed', sans-serif;
   font-size: 30px;
-  float: left;
-  margin-top: -6px;
   color: rgba(255, 255, 255, 0.8);
 }
 
@@ -49,7 +46,6 @@ a {
 
 #menu-items {
   float: right;
-  margin-top: 4px;
   font-size: 17px;
   color: rgba(255, 255, 255, 0.8);
 }
@@ -78,26 +74,18 @@ a {
 
 #content-container {
   z-index: 1;
-  position: absolute;
-  top: 50px;
-  bottom: 0;
+  position: relative;
   width: 100%;
-  height: auto;
 }
 
 #content {
   position: relative;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 0;
-  margin-bottom: 0;
-  width: 800px;
+  margin: 0 auto;
   font-size: 16px;
   font-family: 'Raleway', Helvetica, Arial, sans-serif;
   font-weight: 300;
   line-height: 1.5;
-  padding-bottom: 20px;
-  padding-top: 20px;
+  max-width: 840px;
 }
 
 #content a {
@@ -109,7 +97,8 @@ a {
   text-decoration: underline;
 }
 
-#info-table {
+#content-table {
+  padding: 20px;
   width: 100%;
   margin: 0;
 }
@@ -224,6 +213,16 @@ h2 {
 
 .text-justify {
   text-align: justify;
+}
+
+.viz-iframe-container {
+  position: absolute;
+  top: 50px;
+  bottom: 0;
+  left: 0;
+  height: auto;
+  width: 100%;
+  min-width: 840px;
 }
 
 .viz-iframe {
