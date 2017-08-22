@@ -119,8 +119,8 @@
   width: 100%;
   padding-left: 0;
   padding-right: 0;
-  padding-top: 0;
-  padding-bottom: 5px;
+  padding-top: 3px;
+  padding-bottom: 9px;
   margin: 0;
   text-align: center;
   display: block;
@@ -133,8 +133,8 @@
   width: 10px;
   height: 10px;
   border-radius: 10px;
-  background-color: rgba(0, 0, 0, 1);
-  border: 1px solid rgba(0, 0, 0, 1);
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   transition: border 0.1s, background-color 0.1s;
   cursor: pointer;
   margin-left: 5px;
@@ -145,10 +145,10 @@
 
 .slideshow .slideshow-navigation-item-selected {
   background-color: rgba(255, 255, 255, 1) !important;
-  border: 1px solid rgba(0, 0, 0, 1) !important;
+  border: 1px solid rgba(255, 255, 255, 1) !important;
 }
 
 .slideshow .slideshow-navigation-item:hover {
   background-color: rgba(255, 255, 255, 1);
-  border: 1px solid rgba(0, 0, 0, 1);
+  border: 1px solid rgba(255, 255, 255, 1);
 }
