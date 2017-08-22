@@ -1,3 +1,12 @@
+/*************************************************************************
+ * This css is developed by Yen-Chia Hsu
+ * Copyright Yen-Chia Hsu.
+ * GitHub: https://github.com/yenchiah/project-website-template
+ * Contact: hsu.yenchia@gmail.com
+ * License: GNU General Public License v2
+ * Version: v1.1
+ *************************************************************************/
+
 html, body {
   margin: 0;
   padding: 0;
@@ -11,7 +20,7 @@ a {
   cursor: pointer;
 }
 
-#menu-container {
+.menu-container {
   z-index: 2;
   position: relative;
   width: 100%;
@@ -19,38 +28,38 @@ a {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
 }
 
-#menu {
+.menu {
   position: relative;
   margin: 0 auto;
   max-width: 840px;
 }
 
-#menu-table {
+.menu-table {
   padding: 0 20px;
   width: 100%;
   margin: 0;
   height: 50px;
 }
 
-#logo {
+.logo {
   font-family: 'Open Sans Condensed', sans-serif;
   font-size: 30px;
   color: rgba(255, 255, 255, 0.8);
 }
 
-#logo a {
+.logo a {
   text-decoration: none;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.8);
 }
 
-#menu-items {
+.menu-items {
   float: right;
   font-size: 17px;
   color: rgba(255, 255, 255, 0.8);
 }
 
-#menu-items a {
+.menu-items a {
   margin-left: 40px;
   text-decoration: none;
   font-weight: 500;
@@ -61,7 +70,7 @@ a {
   -webkit-transition: opacity 0.2s ease-in-out;
 }
 
-#menu-items a:hover {
+.menu-items a:hover {
   color: rgb(255, 255, 255);
   opacity: 1;
 }
@@ -72,13 +81,13 @@ a {
   font-weight: 700 !important;
 }
 
-#content-container {
+.content-container {
   z-index: 1;
   position: relative;
   width: 100%;
 }
 
-#content {
+.content {
   position: relative;
   margin: 0 auto;
   font-size: 16px;
@@ -88,25 +97,19 @@ a {
   max-width: 840px;
 }
 
-#content a {
+.content a {
   text-decoration: none;
   color: #9a2328;
 }
 
-#content a:hover {
+.content a:hover {
   text-decoration: underline;
 }
 
-#content-table {
+.content-table {
   padding: 20px;
   width: 100%;
   margin: 0;
-}
-
-#download-button {
-  width: 160px;
-  height: 35px;
-  line-height: 35px;
 }
 
 .left-align {
@@ -117,67 +120,60 @@ a {
   float: right;
 }
 
+h2 {
+  font-size: 24px;
+  margin: 10px 0 10px 0;
+  padding: 0;
+}
+
 .text {
-  margin: 5px 0 5px 0;
+  margin: 10px 0 10px 0;
   padding: 0;
 }
 
 .image {
   margin: 15px 0 15px 0;
   padding: 0;
+  border: 1px solid #666666;
 }
 
 .buttons {
-  padding: 15px 0 15px 0;
-  margin: 0;
-}
-
-.force-scroll {
-  overflow-y: scroll;
-}
-
-.image-viz {
-  background-image: url(../img/viz.png);
-  background-size: 380px 241px;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.image-story {
-  background-image: url(../img/story.png);
-  background-size: 380px 241px;
-  background-repeat: no-repeat;
-  background-position: center;
+  margin: 10px 0 10px 0;
+  padding: 0;
 }
 
 .image-button {
+  background-repeat: no-repeat;
+  background-position: center;
   position: relative;
   display: block;
-  width: 380px;
-  height: 239px;
   border: 1px solid #666666;
-  margin: 15px 0 5px 0;
+  margin: 10px 0 5px 0;
   padding: 0;
   transition: border 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .image-button:hover {
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.8);
-  border: 1px solid #212121;
+  border: 1px solid #222222;
 }
 
 .image-button-caption {
-  width: 380px;
+  width: 100%;
   text-align: center;
-  margin: 0 0 15px 0;
+  margin: 0 0 10px 0;
   padding: 0;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
 .custom-button {
+  padding: 10px 25px;
   display: table;
   text-align: center;
-  background-color: #62a52c;
+  background-color: #7d7d7d;
   color: white;
   font-family: 'Raleway', Helvetica, Arial, sans-serif;
   font-size: 14px;
@@ -190,12 +186,12 @@ a {
 }
 
 .custom-button:hover {
-  background-color: #43731F;
+  background-color: #4d4d4d;
 }
 
 .custom-button:active {
   box-shadow: none;
-  background-color: #43731F;
+  background-color: #4d4d4d;
 }
 
 .noselect {
@@ -207,12 +203,28 @@ a {
   user-select: none; /* Non-prefixed version, currently not supported by any browser */
 }
 
-h2 {
-  font-size: 1.5em;
+.center-align-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.left-align-content {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.text-large {
+  font-size: 20px;
 }
 
 .text-justify {
   text-align: justify;
+}
+
+.text-center {
+  text-align: center;
 }
 
 .iframe-container {
@@ -231,16 +243,10 @@ h2 {
   height: 100%;
 }
 
-.box {
-  position: relative;
-  width: 100%;
-  height: 450px;
-  border: 1px solid #000000;
-  display: flex;
-  margin-top: 15px;
-  margin-bottom: 15px;
-}
-
 .force-no-scroll {
   overflow-y: hidden;
+}
+
+.force-scroll {
+  overflow-y: scroll;
 }

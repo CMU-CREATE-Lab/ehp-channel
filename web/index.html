@@ -3,22 +3,23 @@
 <head>
   <title>Environmental Health Channel</title>
   <link href="css/main.css" media="screen" rel="stylesheet" type="text/css"/>
+  <link href="css/index.css" media="screen" rel="stylesheet" type="text/css"/>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:400,700' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Raleway:400,600,700' rel='stylesheet' type='text/css'>
 </head>
 <body>
-<div id="menu-container" class="noselect">
-  <div id="menu">
-    <table id="menu-table">
+<div class="menu-container noselect">
+  <div class="menu">
+    <table class="menu-table">
       <tr>
         <td>
-          <div id="logo">
+          <div class="logo">
             <a href="javascript:void(0)">Environmental Health Channel</a>
           </div>
         </td>
         <td>
-          <div id="menu-items">
+          <div class="menu-items">
             <a href="javascript:void(0)" class="menu-highlight">Overview</a>
             <a href="visualization.html#slideshow=0">Visualization</a>
           </div>
@@ -27,9 +28,9 @@
     </table>
   </div>
 </div>
-<div id="content-container">
-  <div id="content">
-    <table id="content-table">
+<div class="content-container">
+  <div class="content">
+    <table class="content-table">
       <tr>
         <td colspan="2">
           <p class="text text-justify">
@@ -42,12 +43,16 @@
       </tr>
       <tr>
         <td>
-          <a href="visualization.html" class="image-button left-align image-viz"></a>
-          <p class="image-button-caption left-align">Interact with the Data Visualization Tool</p>
+          <div class="left-align">
+            <a href="visualization.html" class="image-button" id="image-viz"></a>
+            <p class="image-button-caption left-align">Interact with the Data Visualization Tool</p>
+          </div>
         </td>
         <td>
-          <a href="visualization.html#slideshow=0" class="image-button right-align image-story"></a>
-          <p class="image-button-caption right-align">Explore Stories of Fracking-Affected Families</p>
+          <div class="right-align">
+            <a href="visualization.html#slideshow=0" class="image-button" id="image-story"></a>
+            <p class="image-button-caption right-align">Explore Stories of Fracking-Affected Families</p>
+          </div>
         </td>
       </tr>
       <tr>
@@ -60,7 +65,7 @@
       </tr>
       <tr>
         <td colspan="2">
-          <div class="box"><div style="margin: auto auto; font-size: 50px;">Tutorial video will be here</div></div>
+          <div class="box"><div class="box-text">Tutorial video will be here</div></div>
         </td>
       </tr>
       <tr>
