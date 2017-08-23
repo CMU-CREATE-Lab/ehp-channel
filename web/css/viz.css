@@ -50,13 +50,9 @@
 }
 
 .viz-slideshow-inner-container {
-  margin-bottom: auto;
-  margin-top: auto;
-  margin-left: auto;
-  margin-right: auto;
-  min-width: 800px;
+  margin: auto;
+  display: table; /* Microsoft Edge will not work without this line */
   width: 800px;
-  max-width: 800px;
   z-index: 9;
   border: 1px solid #000000;
 }
