@@ -37,19 +37,19 @@
     function addLegend() {
       // Add DOM element
       var $legend = $('<div class="color-scale-legend"></div>');
+      var $top_text = $('<div class="legend-top-text legend-text">high</div>');
+      var $bottom_text = $('<div class="legend-bottom-text legend-text">low</div>');
+      $legend.append($top_text);
+      $legend.append($bottom_text);
       $container.append($legend);
 
       // Parameters
       var w = $legend.width();
       var h = $legend.height();
       var center_x = w / 2;
-      var center_y = h / 2;
-      var margin_t = 10; // distance between text and top border
-      var margin_b = 7; // distance between text bottom border
-      var bar_margin_t = 7; // distance between color bar and top text
-      var bar_margin_b = 4; // distance between color bar and bottom text
-      var font_size = 11;
-      var bar_h = h - bar_margin_t - bar_margin_b - margin_t - margin_b - font_size * 2;
+      var margin_t = 25; // distance between color bar and top border
+      var margin_b = 23; // distance between color bar and bottom border
+      var bar_h = h - margin_t - margin_b;
       var bar_w = 10;
 
       // Add the legend container
@@ -80,30 +80,10 @@
       svg.append("rect")
         .attr("class", "legend-rect")
         .attr("x", center_x - bar_w / 2)
-        .attr("y", center_y - bar_h / 2)
+        .attr("y", margin_t)
         .attr("width", bar_w)
         .attr("height", bar_h)
         .style("fill", "url(#linear-gradient)");
-
-      // Add the "high" text
-      svg.append("text")
-        .attr("class", "legend-high")
-        .attr("x", center_x)
-        .attr("y", center_y - bar_h / 2 - bar_margin_t)
-        .attr("font-size", font_size)
-        .attr("alignment-baseline", "baseline")
-        .style("text-anchor", "middle")
-        .text("high");
-
-      // Add the "low" text
-      svg.append("text")
-        .attr("class", "legend-low")
-        .attr("x", center_x)
-        .attr("y", center_y + bar_h / 2 + bar_margin_b)
-        .attr("font-size", font_size)
-        .attr("alignment-baseline", "hanging")
-        .style("text-anchor", "middle")
-        .text("low");
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////

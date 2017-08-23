@@ -14,3 +14,27 @@
 .color-scale-legend .legend-rect {
   opacity: 0.75;
 }
+
+.color-scale-legend .legend-top-text {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  width: auto;
+  vertical-align: top;
+}
+
+.color-scale-legend .legend-bottom-text {
+  position: absolute;
+  bottom: 7px;
+  left: 0;
+  right: 0;
+  width: auto;
+  vertical-align: bottom;
+}
+
+.color-scale-legend .legend-text {
+  font-family: 'Open Sans', sans-serif;
+  text-align: center;
+  font-size: 11px;
+}
