@@ -512,15 +512,12 @@
     function addStory() {
       // Add DOM
       var slideshow_inner_class = "viz-slideshow-inner-container";
-      var slideshow_outer_mask_class = "viz-slideshow-outer-mask";
       var slideshow_outer_class = "viz-slideshow-outer-container";
       var $slideshow_inner = $('<div class="' + slideshow_inner_class + '"></div>');
       var $slideshow_outer = $('<div class="' + slideshow_outer_class + '"></div>');
-      var $slideshow_outer_mask = $('<div class="' + slideshow_outer_mask_class + '"></div>');
       var $slideshow_close = $('<div class="viz-slideshow-close" title="Close slideshow"></div>');
       $slideshow_outer.append($slideshow_inner);
       $container.append($slideshow_outer);
-      $container.append($slideshow_outer_mask);
       $slideshow_outer.append($slideshow_close);
 
       // Add slideshows
@@ -563,12 +560,10 @@
 
       function onSlideshowClose() {
         $slideshow_outer.hide();
-        $slideshow_outer_mask.hide();
       }
 
       function onSlideshowOpen() {
         $slideshow_outer.show();
-        $slideshow_outer_mask.show();
       }
     }
 

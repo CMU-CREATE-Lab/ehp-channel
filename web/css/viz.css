@@ -37,27 +37,16 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 170px;
+  bottom: 0;
   top: 0;
   height: auto;
   width: auto;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   z-index: 10;
   display: flex;
   overflow-x: auto;
   overflow-y: auto;
   border-bottom: 1px solid transparent;
-}
-
-.viz-slideshow-outer-mask {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 170px;
-  width: auto;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 10;
 }
 
 .viz-slideshow-inner-container {
