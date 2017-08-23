@@ -5,7 +5,7 @@
  * Dependencies: jQuery (http://jquery.com/)
  * Contact: hsu.yenchia@gmail.com
  * License: GNU General Public License v2
- * Version: v1.11
+ * Version: v1.12
  *************************************************************************/
 
 (function () {
@@ -334,7 +334,10 @@
 
       // Normalization
       var dict_nz = {};
-      var values = Object.values(dict_trans);
+      //var values = Object.values(dict_trans); // IE not happy about this
+      var values = Object.keys(dict_trans).map(function(k) {
+        return dict_trans[k];
+      });
       var max = percentile(values, max_percentile);
       var min = percentile(values, min_percentile);
       var z = max - min;

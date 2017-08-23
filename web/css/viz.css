@@ -43,15 +43,15 @@
   width: auto;
   background-color: rgba(0, 0, 0, 0.7);
   z-index: 10;
-  display: flex;
+  display : flex;
+  align-items : center;
+  justify-content: center;
   overflow-x: auto;
   overflow-y: auto;
   border-bottom: 1px solid transparent;
 }
 
 .viz-slideshow-inner-container {
-  margin: auto;
-  display: table; /* Microsoft Edge will not work without this line */
   width: 800px;
   z-index: 9;
   border: 1px solid #000000;
