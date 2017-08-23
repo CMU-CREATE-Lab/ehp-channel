@@ -84,7 +84,7 @@
     // Chart settings
     var chart_settings = {
       speck: {
-        chart_min_width: 800,
+        chart_min_width: available_dimensions["speck"].length * 130,
         margin_left: 10,
         margin_right: 10,
         wrap_label_width: 100,
@@ -94,7 +94,7 @@
         axis_font_size: "12px"
       },
       health: {
-        chart_min_width: 1100,
+        chart_min_width: available_dimensions["health"].length * 75,
         margin_left: 15,
         margin_right: 10,
         wrap_label_width: 60,
