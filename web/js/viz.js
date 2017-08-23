@@ -75,6 +75,12 @@
       health: "Stress/anxiety"
     };
 
+    // The title on the top-left on the map
+    var title = {
+      speck: "Sensor Data",
+      health: "Health Data"
+    };
+
     // Dimension settings
     var dimension_settings = {
       speck: {},
@@ -181,6 +187,7 @@
 
       // Add data toggle button
       var $data_toggle_btn = $('<div class="data-toggle-btn custom-button" title="Toggle sensor or health data"><div>');
+      $data_toggle_btn.text(title[mode]);
       $data_toggle_btn.addClass(mode);
       $data_toggle_btn.on("click", function () {
         var $this = $(this);
@@ -197,12 +204,14 @@
           mode = "speck";
           $this.addClass("speck");
           $this.removeClass("health");
+          $this.text(title[mode]);
         } else {
           $("#" + container_id + " .viz-speck-chart-container").css("visibility", "hidden");
           $("#" + container_id + " .viz-health-chart-container").css("visibility", "visible");
           mode = "health";
           $this.addClass("health");
           $this.removeClass("speck");
+          $this.text(title[mode]);
         }
         geo_heatmap.setZipcodeMetadata(analysis_aggr_by_zipcode[mode][selected_dimension[mode]]);
       });

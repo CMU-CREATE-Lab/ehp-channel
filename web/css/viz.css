@@ -43,8 +43,8 @@
   width: auto;
   background-color: rgba(0, 0, 0, 0.7);
   z-index: 10;
-  display : flex;
-  align-items : center;
+  display: flex;
+  align-items: center;
   justify-content: center;
   overflow-x: auto;
   overflow-y: auto;
@@ -98,13 +98,23 @@ a {
   padding-left: 0px;
 }
 
-.home-btn {
+.data-toggle-btn {
   position: absolute;
-  font-size: 11px;
   left: 10px;
   top: 10px;
-  opacity: 0.75;
-  z-index: 1;
+  background-image: url(../img/data-toggle.png);
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  width: auto !important;
+  padding-left: 45px;
+  padding-right: 16px;
+}
+
+.home-btn {
+  position: absolute;
+  left: 10px;
+  top: 65px;
   background-image: url(../img/home.png);
   background-size: 20px 20px;
   background-repeat: no-repeat;
@@ -113,25 +123,9 @@ a {
 
 .terrain-btn {
   position: absolute;
-  font-size: 11px;
-  left: 10px;
-  top: 65px;
-  opacity: 0.75;
-  z-index: 1;
-  background-image: url(../img/terrain.png);
-  background-size: 20px 20px;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.data-toggle-btn {
-  position: absolute;
-  font-size: 11px;
   left: 10px;
   top: 120px;
-  opacity: 0.75;
-  z-index: 1;
-  background-image: url(../img/data-toggle.png);
+  background-image: url(../img/terrain.png);
   background-size: 20px 20px;
   background-repeat: no-repeat;
   background-position: center;
@@ -140,13 +134,17 @@ a {
 .custom-button {
   background-color: white;
   color: black;
-  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  font-family: 'Open Sans Condensed', sans-serif;
   outline: none;
   border: 1px solid #777777;
   width: 45px;
   height: 45px;
   border-radius: 23px;
   cursor: pointer;
+  opacity: 0.75;
+  z-index: 1;
+  font-size: 23px;
+  line-height: 45px;
 }
 
 .custom-button:focus {
