@@ -151,6 +151,7 @@
     //
     var close = function () {
       $slideshow.detach();
+      setSlide(0);
       if (typeof slideshow_close_callback === "function") {
         slideshow_close_callback();
       }
