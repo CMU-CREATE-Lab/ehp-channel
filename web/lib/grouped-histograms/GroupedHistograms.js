@@ -123,7 +123,7 @@
       if (width == null) return;
       text.each(function () {
         var text = d3.select(this),
-          words = text.text().replace("/", " ").split(/\s+/).reverse(),
+          words = text.text().split(/\s+/).reverse(),
           word,
           line = [],
           lineNumber = 0,

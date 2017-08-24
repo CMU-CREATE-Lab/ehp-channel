@@ -71,8 +71,8 @@
 
     // Set selected dimensions
     var selected_dimension = {
-      speck: "Peaks per day",
-      health: "Stress/anxiety"
+      speck: available_dimensions["speck"][0],
+      health: available_dimensions["health"][0]
     };
 
     // The title on the top-left on the map
@@ -360,28 +360,15 @@
         // Set scale for the y axis according to different dimensions
         var scale;
         if (type === "speck") {
-          if (d === "PM baseline") {
-            scale = d3.scale.linear().clamp(true);
-            dimension_settings[type][d]["tickFormat"] = d3.format(",d");
-            dimension_settings[type][d]["tickValues"] = [10, 20, 30, 40, 50];
-          } else if (d === "Peaks per day") {
-            scale = d3.scale.linear().clamp(true);
-            dimension_settings[type][d]["tickValues"] = [2, 4, 6, 8, 10];
-          } else if (d === "Peak duration (mins)") {
-            scale = d3.scale.log().base(2).clamp(true);
-            dimension_settings[type][d]["tickFormat"] = d3.format(",d");
-            dimension_settings[type][d]["tickValues"] = [5, 10, 20, 40, 80, 160, 320];
-          } else if (d === "Hours between peaks") {
-            scale = d3.scale.log().base(2).clamp(true);
-            dimension_settings[type][d]["tickFormat"] = d3.format(",2f");
-            dimension_settings[type][d]["tickValues"] = [2.5, 5, 10, 20, 40, 80, 160];
-          } else if (d === "Accumulation per day") {
-            scale = d3.scale.log().base(2).clamp(true);
-            dimension_settings[type][d]["tickFormat"] = d3.format(",2f");
-            dimension_settings[type][d]["tickValues"] = [1.25, 2.5, 5, 10, 20, 40, 80];
-          } else {
-            scale = d3.scale.linear().clamp(true);
-          }
+          /*if (d === "Accumulation per day (mg/m3)") {
+           scale = d3.scale.log().base(2).clamp(true);
+           //dimension_settings[type][d]["tickFormat"] = d3.format(",d");
+           dimension_settings[type][d]["tickFormat"] = d3.format(",2f");
+           dimension_settings[type][d]["tickValues"] = [1.25, 2.5, 5, 10, 20, 40, 80];
+           } else {
+           scale = d3.scale.linear().clamp(true);
+           }*/
+          scale = d3.scale.linear().clamp(true);
           scale.range([chart_height - margin_top - margin_bottom, 0])
             .domain(d3.extent(data[type], function (p) {
               return +p[d];

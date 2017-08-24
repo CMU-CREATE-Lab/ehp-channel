@@ -4,6 +4,7 @@ from uploadAllSpeckData import *
 from simplifyOldUserInfo import *
 from speckNameToHealthId import *
 from createDeviceInfoTable import *
+from mergeDeviceInfoTable import *
 from createHealthInfoTable import *
 
 from processData import *
@@ -46,6 +47,11 @@ def main(argv):
     fpath_out_new = p+"result/speck_new.csv"
     #createDeviceInfoTable(fpath_in_old, fpath_out_old, "old")
     #createDeviceInfoTable(fpath_in_new, fpath_out_new, "new")
+
+    # Merge device tables
+    fpath_in = [p+"ehp/index_calculator.csv", p+"ehp/speck_name_to_zipcode.csv"]
+    fpath_out = p+"result/speck.csv"
+    #mergeDeviceInfoTable(fpath_in, fpath_out)
 
     # Build the health information table
     fpath_in = p+"health/health.xlsx"
