@@ -92,7 +92,7 @@ def formatSpeckData(fpath_in, fpath_out, fname_in):
     # Also rename column names
     # IMPORTANT: discard files that have epochtime before Sep 2015, 1441080000 (maybe not calibrated)
     epochtime_name = "epoch_time"
-    epochtime_min = 1441080000
+    epochtime_min = 0#1441080000
     cols = df.columns.values
     cols_new = copy.deepcopy(cols)
     was_calibrated = False
@@ -113,19 +113,26 @@ def formatSpeckData(fpath_in, fpath_out, fname_in):
                 cols_new[i] = c_part
                 num_of_valid_channels += 1
                 break
-    if not was_calibrated:
-        r_msg.append("ERROR: '" + fname_in + "' was deployed before Sep 2015 (may not be calibrated)")
-        logger.error(r_msg[1])
-        return r_msg
     if not has_valid_epochtime:
         r_msg.append("ERROR: '" + fname_in + "' does not have valid epoch time format (in seconds)")
         logger.error(r_msg[1])
         return r_msg
-    if num_of_valid_channels < len(channel_names):
-        r_msg.append("ERROR: '" + fname_in + "' has missing channels and incomplete data")
+    if not was_calibrated:
+        r_msg.append("ERROR: '" + fname_in + "' was deployed before Sep 2015 (may not be calibrated)")
+        logger.error(r_msg[1])
+        return r_msg
+    if num_of_valid_channels != len(channel_names):
+        r_msg.append("ERROR: '" + fname_in + "' has duplicated or missing channels")
         logger.error(r_msg[1])
         return r_msg
     df.columns = cols_new
+
+    # Check channel names
+    for c in channel_names:
+        if not c in df.columns:
+            r_msg.append("ERROR: '" + fname_in + "' does not have channel " + c)
+            logger.error(r_msg[1])
+            return r_msg
 
     # Format data
     logger.info("Parsing rows in '" + fname_in + "'")
