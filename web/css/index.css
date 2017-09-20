@@ -1,14 +1,14 @@
 #image-viz {
   background-image: url(../img/viz.png);
-  background-size: 430px 270px;
-  height: 270px;
+  background-size: 430px 323px;
+  height: 323px;
   width: 430px;
 }
 
 #image-story {
-  background-image: url(../img/story.png);
-  background-size: 430px 270px;
-  height: 270px;
+  background-image: url(../img/story.jpg);
+  background-size: 430px 323px;
+  height: 323px;
   width: 430px;
 }
 
