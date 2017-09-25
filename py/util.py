@@ -1,3 +1,7 @@
+# Python helper functions
+# Developed by Yen-Chia Hsu, hsu.yenchia@gmail.com
+# v1.0
+
 import logging
 from os import listdir
 from os.path import isfile, join
