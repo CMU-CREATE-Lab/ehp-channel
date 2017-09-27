@@ -178,9 +178,17 @@ a {
   background-color: rgb(210, 210, 210);
 }
 
-.custom-button-selected {
-  background-color: #292929;
+.sensor-button-selected {
+  background-color: #cb181d;
   color: white;
+  opacity: 0.7;
+  border: 1px solid black;
+}
+
+.health-button-selected {
+  background-color: #2171b5;
+  color: white;
+  opacity: 0.7;
   border: 1px solid black;
 }
 

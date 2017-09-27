@@ -212,9 +212,9 @@
         setMode("health");
       });
       if (mode === "speck") {
-        $sensor_data_btn.addClass("custom-button-selected");
+        $sensor_data_btn.addClass("sensor-button-selected");
       } else if (mode === "health") {
-        $health_data_btn.addClass("custom-button-selected");
+        $health_data_btn.addClass("health-button-selected");
       }
       $viz_map_container.append($sensor_data_btn);
       $viz_map_container.append($health_data_btn);
@@ -230,15 +230,15 @@
           $("#" + container_id + " .viz-speck-chart-container").css("visibility", "visible");
           color_scale_legend["speck"].show();
           color_scale_legend["health"].hide();
-          $sensor_data_btn.addClass("custom-button-selected");
-          $health_data_btn.removeClass("custom-button-selected");
+          $sensor_data_btn.addClass("sensor-button-selected");
+          $health_data_btn.removeClass("health-button-selected");
         } else if (desired_mode === "health") {
           $("#" + container_id + " .viz-speck-chart-container").css("visibility", "hidden");
           $("#" + container_id + " .viz-health-chart-container").css("visibility", "visible");
           color_scale_legend["speck"].hide();
           color_scale_legend["health"].show();
-          $sensor_data_btn.removeClass("custom-button-selected");
-          $health_data_btn.addClass("custom-button-selected");
+          $sensor_data_btn.removeClass("sensor-button-selected");
+          $health_data_btn.addClass("health-button-selected");
         }
         highlighted_zipcode = undefined;
         var desired_zipcode_metadata = analysis_aggr_by_zipcode[desired_mode][selected_dimension[desired_mode]];
