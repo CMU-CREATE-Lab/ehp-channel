@@ -26,8 +26,15 @@
 
     // Set color scale for displaying the normalized value
     var ncolor_scale = d3.scale.linear()
+      //.domain([0, 0.5, 1])
+      //.range(["#ff6e63", "#e00f00", "#660500"]) // red
+      //.domain([0, 0.5, 1])
+      //.range(["#69c2dc", "#2b79b0", "#001664"]) // blue
+      //.domain([0, 0.65, 1])
+      //.range(["#6eb1d9", "#835db9", "#810007"]) // blue to red
       .domain([0, 0.25, 0.75, 1])
-      .range(["#00a511", "#fff200", "#ff6200", "#ff0000"])
+      .range(["#78c679", "#31a354", "#2c7fb8", "#002d68"]) // green to blue
+      //.range(["#00a511", "#fff200", "#ff6200", "#ff0000"]) // green to red
       .interpolate(d3.interpolateLab);
 
     // Set color scale for displaying the z-score
@@ -152,7 +159,7 @@
         color_scale: ncolor_scale,
         max_percentile: max_percentile,
         min_percentile: min_percentile,
-        color_opacity: 0.5,
+        color_opacity: 0.6,
         init_map_center: {
           lat: 40.4,
           lng: -80.05
