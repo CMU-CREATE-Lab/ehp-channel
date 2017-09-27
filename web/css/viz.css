@@ -76,7 +76,17 @@
   transition: background-color 0.2s;
 }
 
-.viz-color-scale-legend-container {
+.viz-speck-color-scale-legend-container {
+  position: absolute;
+  width: 40px;
+  height: 150px;
+  border: 1px solid #666666;
+  right: 10px;
+  z-index: 1;
+  bottom: 190px;
+}
+
+.viz-health-color-scale-legend-container {
   position: absolute;
   width: 40px;
   height: 150px;
@@ -98,23 +108,28 @@ a {
   padding-left: 0;
 }
 
-.data-toggle-btn {
+.sensor-data-btn {
   position: absolute;
-  left: 10px;
+  left: 65px;
   top: 10px;
-  background-image: url(../img/data-toggle.png);
-  background-size: 20px 20px;
-  background-repeat: no-repeat;
-  background-position: 15px center;
   width: auto !important;
-  padding-left: 45px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.health-data-btn {
+  position: absolute;
+  left: 160px;
+  top: 10px;
+  width: auto !important;
+  padding-left: 16px;
   padding-right: 16px;
 }
 
 .home-btn {
   position: absolute;
   left: 10px;
-  top: 65px;
+  top: 10px;
   background-image: url(../img/home.png);
   background-size: 20px 20px;
   background-repeat: no-repeat;
@@ -141,10 +156,16 @@ a {
   height: 45px;
   border-radius: 23px;
   cursor: pointer;
-  opacity: 0.75;
+  opacity: 0.8;
   z-index: 1;
   font-size: 23px;
   line-height: 45px;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+  -khtml-user-select: none; /* Konqueror */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently not supported by any browser */
 }
 
 .custom-button:focus {
@@ -155,6 +176,12 @@ a {
 
 .custom-button:active {
   background-color: rgb(210, 210, 210);
+}
+
+.custom-button-selected {
+  background-color: #292929;
+  color: white;
+  border: 1px solid black;
 }
 
 .info-window-content {

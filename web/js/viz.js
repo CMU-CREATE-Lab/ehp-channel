@@ -25,27 +25,32 @@
     var min_percentile = 0.05; // using quantile instead of min value when normalizing data
 
     // Set color scale for displaying the normalized value
-    var ncolor_scale = d3.scale.linear()
-      //.domain([0, 0.5, 1])
-      //.range(["#ff6e63", "#e00f00", "#660500"]) // red
-      //.domain([0, 0.5, 1])
-      //.range(["#69c2dc", "#2b79b0", "#001664"]) // blue
-      //.domain([0, 0.65, 1])
-      //.range(["#6eb1d9", "#835db9", "#810007"]) // blue to red
-      .domain([0, 0.25, 0.75, 1])
-      .range(["#78c679", "#31a354", "#2c7fb8", "#002d68"]) // green to blue
-      //.range(["#00a511", "#fff200", "#ff6200", "#ff0000"]) // green to red
-      .interpolate(d3.interpolateLab);
+    //.range(["#fcbba1", "#cb181d", "#67000d"]) // red
+    //.range(["#c6dbef", "#2171b5", "#08306b"]) // blue
+    //.range(["#ccece6", "#238b45", "#00441b"]) // green
+    //.range(["#fdd0a2", "#d94801", "#7f2704"]) // orange
+    //.range(["#dadaeb", "#6a51a3", "#3f007d"]) // purple
+    //.range(["#6eb1d9", "#835db9", "#810007"]) // blue to red
+    //.range(["#78c679", "#31a354", "#2c7fb8", "#002d68"]) // green to blue
+    //.range(["#00a511", "#fff200", "#ff6200", "#ff0000"]) // green to red
+    var ncolor_scale = {
+      "speck": d3.scale.linear().domain([0, 0.5, 1]).range(["#fcbba1", "#cb181d", "#67000d"]).interpolate(d3.interpolateLab),
+      "health": d3.scale.linear().domain([0, 0.5, 1]).range(["#c6dbef", "#2171b5", "#08306b"]).interpolate(d3.interpolateLab)
+    };
 
     // Set color scale for displaying the z-score
-    var zcolor_scale = d3.scale.linear()
-      .domain([-1, -0.5, 0.5, 1.5])
-      .range(["#00a511", "#fff200", "#ff6200", "#ff0000"])
-      .interpolate(d3.interpolateLab);
+    /*var zcolor_scale = d3.scale.linear()
+     .domain([-1, -0.5, 0.5, 1.5])
+     .range(["#00a511", "#fff200", "#ff6200", "#ff0000"])
+     .interpolate(d3.interpolateLab);*/
 
     // Objects
     var geo_heatmap;
     var chart = {
+      speck: undefined,
+      health: undefined
+    };
+    var color_scale_legend = {
       speck: undefined,
       health: undefined
     };
@@ -84,8 +89,8 @@
 
     // The title on the top-left on the map
     var title = {
-      speck: "Sensor Data",
-      health: "Health Data"
+      speck: "PM<sub>2.5</sub>",
+      health: "Health Symptoms"
     };
 
     // Dimension settings
@@ -128,7 +133,10 @@
     function init() {
       // Add map and the color legend
       addMap();
-      addColorScaleLegend();
+
+      // Add two color legends
+      addColorScaleLegend("speck", mode !== "speck");
+      addColorScaleLegend("health", mode !== "health");
 
       // Add two analysis charts
       addAnalysisChart("speck", mode !== "speck");
@@ -156,7 +164,7 @@
         zipcode_bound_info: settings["zipcode_bound_info"],
         zipcode_metadata: analysis_aggr_by_zipcode[mode][selected_dimension[mode]],
         init_map_zoom: 9,
-        color_scale: ncolor_scale,
+        color_scale: ncolor_scale[mode],
         max_percentile: max_percentile,
         min_percentile: min_percentile,
         color_opacity: 0.6,
@@ -179,50 +187,65 @@
       $viz_map_container.append($home_btn);
 
       // Add terrain button
-      var $terrain_btn = $('<div class="terrain-btn custom-button" title="Toggle terrain view"><div>');
-      $terrain_btn.on("click", function () {
-        var $this = $(this);
-        if ($this.hasClass("button-pressed")) {
-          geo_heatmap.getGoogleMap().setMapTypeId("roadmap");
-          $this.removeClass("button-pressed");
-        } else {
-          geo_heatmap.getGoogleMap().setMapTypeId("terrain");
-          $this.addClass("button-pressed");
-        }
-      });
-      $viz_map_container.append($terrain_btn);
+      /*var $terrain_btn = $('<div class="terrain-btn custom-button" title="Toggle terrain view"><div>');
+       $terrain_btn.on("click", function () {
+       var $this = $(this);
+       if ($this.hasClass("button-pressed")) {
+       geo_heatmap.getGoogleMap().setMapTypeId("roadmap");
+       $this.removeClass("button-pressed");
+       } else {
+       geo_heatmap.getGoogleMap().setMapTypeId("terrain");
+       $this.addClass("button-pressed");
+       }
+       });
+       $viz_map_container.append($terrain_btn);*/
 
-      // Add data toggle button
-      var $data_toggle_btn = $('<div class="data-toggle-btn custom-button" title="Toggle sensor or health data"><div>');
-      $data_toggle_btn.text(title[mode]);
-      $data_toggle_btn.addClass(mode);
-      $data_toggle_btn.on("click", function () {
-        var $this = $(this);
+      // Add data tab buttons
+      var $sensor_data_btn = $('<div class="sensor-data-btn custom-button" title="Change to sensor data tab"><div>');
+      var $health_data_btn = $('<div class="health-data-btn custom-button" title="Change to health data tab"><div>');
+      $sensor_data_btn.html(title["speck"]);
+      $health_data_btn.html(title["health"]);
+      $sensor_data_btn.on("click", function () {
+        setMode("speck");
+      });
+      $health_data_btn.on("click", function () {
+        setMode("health");
+      });
+      if (mode === "speck") {
+        $sensor_data_btn.addClass("custom-button-selected");
+      } else if (mode === "health") {
+        $health_data_btn.addClass("custom-button-selected");
+      }
+      $viz_map_container.append($sensor_data_btn);
+      $viz_map_container.append($health_data_btn);
+
+      function setMode(desired_mode) {
+        if (desired_mode === mode) return;
         geo_heatmap.unhighlightZipcode();
         geo_heatmap.getInfoWindow().close();
         chart[mode].unhighlight();
-        if (mode === "health") {
+        if (desired_mode === "speck") {
           chart["health"].highlight(data_group_by_zipcode["health"]["all"]);
-        }
-        highlighted_zipcode = undefined;
-        if ($this.hasClass("health")) {
           $("#" + container_id + " .viz-health-chart-container").css("visibility", "hidden");
           $("#" + container_id + " .viz-speck-chart-container").css("visibility", "visible");
-          mode = "speck";
-          $this.addClass("speck");
-          $this.removeClass("health");
-          $this.text(title[mode]);
-        } else {
+          color_scale_legend["speck"].show();
+          color_scale_legend["health"].hide();
+          $sensor_data_btn.addClass("custom-button-selected");
+          $health_data_btn.removeClass("custom-button-selected");
+        } else if (desired_mode === "health") {
           $("#" + container_id + " .viz-speck-chart-container").css("visibility", "hidden");
           $("#" + container_id + " .viz-health-chart-container").css("visibility", "visible");
-          mode = "health";
-          $this.addClass("health");
-          $this.removeClass("speck");
-          $this.text(title[mode]);
+          color_scale_legend["speck"].hide();
+          color_scale_legend["health"].show();
+          $sensor_data_btn.removeClass("custom-button-selected");
+          $health_data_btn.addClass("custom-button-selected");
         }
-        geo_heatmap.setZipcodeMetadata(analysis_aggr_by_zipcode[mode][selected_dimension[mode]]);
-      });
-      $viz_map_container.append($data_toggle_btn);
+        highlighted_zipcode = undefined;
+        var desired_zipcode_metadata = analysis_aggr_by_zipcode[desired_mode][selected_dimension[desired_mode]];
+        var desired_color_scale = ncolor_scale[desired_mode];
+        geo_heatmap.setZipcodeMetadataAndColorScale(desired_zipcode_metadata, desired_color_scale);
+        mode = desired_mode;
+      }
 
       function generateInfoWindowHTML(zipcode) {
         var html = "";
@@ -300,16 +323,19 @@
       }
     }
 
-    function addColorScaleLegend() {
-      var legend_class = "viz-color-scale-legend-container";
+    function addColorScaleLegend(type, is_hidden) {
+      var legend_class = "viz-" + type + "-color-scale-legend-container";
       var legend_selector = "#" + container_id + " ." + legend_class;
 
       // Add to DOM
       $container.append($('<div class="' + legend_class + '"></div>'));
+      if (typeof is_hidden === "undefined" ? false : is_hidden) {
+        $(legend_selector).css("visibility", "hidden");
+      }
 
       // Create object
-      var color_scale_legend = new edaplotjs.ColorScaleLegend(legend_selector, {
-        color_scale: ncolor_scale
+      color_scale_legend[type] = new edaplotjs.ColorScaleLegend(legend_selector, {
+        color_scale: ncolor_scale[type]
       });
     }
 
@@ -398,6 +424,15 @@
         renderChart("health", dimension_settings["health"]);
       };
 
+      // Add events
+      // TODO: this is a hack, need to move the entire function out to a class
+      $("#" + container_id + " .sensor-data-btn").on("click", function () {
+        changeColorAndRenderChart(selected_dimension["speck"], "speck");
+      });
+      $("#" + container_id + " .health-data-btn").on("click", function () {
+        changeColorAndRenderChart(selected_dimension["health"], "health");
+      });
+
       function renderChart(desired_type, desired_dimension_settings) {
         var w = $(chart_selector).width();
         var options = chart_settings[desired_type];
@@ -467,30 +502,30 @@
       }
 
       // This function is used for mapping the z-score to a color
-      function zcolor(col, dimension) {
-        var z = zscore(_(col).pluck(dimension).map(parseFloat));
-        return function (d) {
-          return zcolor_scale(z(d[dimension]));
-        }
-      }
+      /*function zcolor(col, dimension) {
+       var z = zscore(_(col).pluck(dimension).map(parseFloat));
+       return function (d) {
+       return zcolor_scale(z(d[dimension]));
+       }
+       }*/
 
       // This function is used for mapping the normalized value to a color
       function ncolor(col, dimension) {
         var s = nscore(_(col).pluck(dimension).map(parseFloat));
         return function (d) {
-          return ncolor_scale(s(d[dimension]));
+          return ncolor_scale[mode](s(d[dimension]));
         }
       }
 
       // This function computes the z-score
-      function zscore(col) {
-        var mean = _(col).mean();
-        var sigma = _(col).stdDeviation();
+      /*function zscore(col) {
+       var mean = _(col).mean();
+       var sigma = _(col).stdDeviation();
 
-        return function (d) {
-          return (d - mean) / sigma;
-        };
-      }
+       return function (d) {
+       return (d - mean) / sigma;
+       };
+       }*/
 
       // This function normalizes the original value between 0 to 1
       function nscore(col) {

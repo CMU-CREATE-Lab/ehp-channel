@@ -1,13 +1,3 @@
-/*************************************************************************
- * This library is developed by Yen-Chia Hsu
- * Copyright Yen-Chia Hsu.
- * GitHub: https://github.com/yenchiah/geo-heatmap
- * Dependencies: jQuery (http://jquery.com/), d3.js (https://d3js.org/)
- * Contact: hsu.yenchia@gmail.com
- * License: GNU General Public License v2
- * Version: v1.0
- *************************************************************************/
-
 (function () {
   "use strict";
 
@@ -39,6 +29,7 @@
       var $legend = $('<div class="color-scale-legend"></div>');
       var $top_text = $('<div class="legend-top-text legend-text">high</div>');
       var $bottom_text = $('<div class="legend-bottom-text legend-text">low</div>');
+      var uuid = uuidv4();
       $legend.append($top_text);
       $legend.append($bottom_text);
       $container.append($legend);
@@ -62,7 +53,7 @@
       // Add the linear gradient
       svg.append("defs")
         .append("linearGradient")
-        .attr("id", "linear-gradient")
+        .attr("id", uuid)
         .attr("x1", "0%").attr("y1", "100%")
         .attr("x2", "0%").attr("y2", "0%")
         .selectAll("stop")
@@ -83,13 +74,27 @@
         .attr("y", margin_t)
         .attr("width", bar_w)
         .attr("height", bar_h)
-        .style("fill", "url(#linear-gradient)");
+        .style("fill", "url(#" + uuid + ")");
+    }
+
+    function uuidv4() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Privileged methods
     //
+    this.hide = function () {
+      $container.css("visibility", "hidden");
+    };
+
+    this.show = function () {
+      $container.css("visibility", "visible");
+    };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
