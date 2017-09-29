@@ -36,9 +36,13 @@
     //.range(["#6eb1d9", "#835db9", "#810007"]) // blue to red
     //.range(["#78c679", "#31a354", "#2c7fb8", "#002d68"]) // green to blue
     //.range(["#00a511", "#fff200", "#ff6200", "#ff0000"]) // green to red
-    var ncolor_scale = {
+    /*var ncolor_scale = {
       "speck": d3.scale.linear().domain([0, 0.25, 1]).range(["#737373", "#c17e84", "#ff003b"]).interpolate(d3.interpolateLab),
       "health": d3.scale.linear().domain([0, 0.25, 1]).range(["#737373", "#7d9cc7", "#0084ff"]).interpolate(d3.interpolateLab)
+    };*/
+    var ncolor_scale = {
+      "speck": d3.scale.linear().domain([0, 0.25, 0.75, 1]).range(["#00a511", "#fff200", "#ff6200", "#ff0000"]).interpolate(d3.interpolateLab),
+      "health": d3.scale.linear().domain([0, 0.25, 0.75, 1]).range(["#00a511", "#fff200", "#ff6200", "#ff0000"]).interpolate(d3.interpolateLab)
     };
 
     // Set color scale for displaying the z-score

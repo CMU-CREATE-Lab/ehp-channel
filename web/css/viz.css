@@ -179,14 +179,16 @@ a {
 }
 
 .sensor-button-selected {
-  background-color: #ff003b;
+  /*background-color: #ff003b;*/
+  background-color: #353535;
   color: white;
   opacity: 0.7;
   border: 1px solid #161616;
 }
 
 .health-button-selected {
-  background-color: #0084ff;
+  /*background-color: #0084ff;*/
+  background-color: #353535;
   color: white;
   opacity: 0.7;
   border: 1px solid #161616;
