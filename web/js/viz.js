@@ -174,7 +174,7 @@
         color_scale: ncolor_scale[mode],
         max_percentile: max_percentile,
         min_percentile: min_percentile,
-        color_opacity: 0.7,
+        color_opacity: 0.6,
         init_map_center: {
           lat: 40.4,
           lng: -80.05

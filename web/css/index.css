@@ -12,6 +12,29 @@
   width: 430px;
 }
 
+#image-ehp-logo {
+  background-image: url(../img/ehp_logo.png);
+  background-size: 318px 45px;
+  height: 50px;
+  width: 318px;
+}
+
+#image-create-logo {
+  background-image: url(../img/create_logo.png);
+  background-size: 213px 45px;
+  height: 50px;
+  width: 213px;
+  margin-left: 45px;
+}
+
+#image-cmu-logo {
+  background-image: url(../img/cmu_logo.jpg);
+  background-size: 275px 45px;
+  height: 50px;
+  width: 275px;
+  float: right;
+}
+
 .box {
   position: relative;
   width: 100%;
