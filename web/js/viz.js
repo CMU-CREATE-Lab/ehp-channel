@@ -22,11 +22,12 @@
 
     // For normalization
     var max_percentile = 0.95; // using quantile instead of max value when normalizing data
-    var min_percentile = 0; // using quantile instead of min value when normalizing data
+    var min_percentile = 0.05; // using quantile instead of min value when normalizing data
 
     // Set color scale for displaying the normalized value
-    //.range(["#737373", "#0084ff"]) // grey to blue
-    //.range(["#737373", "#ff003b"]) // grey to red
+    //.range(["#1ac647", "#737373", "#0084ff"]) // green to grey to blue
+    //.range(["#737373", "#7d9cc7", "#0084ff"]) // grey to blue
+    //.range(["#737373", "#c17e84", "#ff003b"]) // grey to red
     //.range(["#fcbba1", "#cb181d", "#67000d"]) // red
     //.range(["#c6dbef", "#2171b5", "#08306b"]) // blue
     //.range(["#ccece6", "#238b45", "#00441b"]) // green
