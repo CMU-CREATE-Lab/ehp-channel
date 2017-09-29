@@ -22,9 +22,11 @@
 
     // For normalization
     var max_percentile = 0.95; // using quantile instead of max value when normalizing data
-    var min_percentile = 0.05; // using quantile instead of min value when normalizing data
+    var min_percentile = 0; // using quantile instead of min value when normalizing data
 
     // Set color scale for displaying the normalized value
+    //.range(["#737373", "#0084ff"]) // grey to blue
+    //.range(["#737373", "#ff003b"]) // grey to red
     //.range(["#fcbba1", "#cb181d", "#67000d"]) // red
     //.range(["#c6dbef", "#2171b5", "#08306b"]) // blue
     //.range(["#ccece6", "#238b45", "#00441b"]) // green
@@ -34,8 +36,8 @@
     //.range(["#78c679", "#31a354", "#2c7fb8", "#002d68"]) // green to blue
     //.range(["#00a511", "#fff200", "#ff6200", "#ff0000"]) // green to red
     var ncolor_scale = {
-      "speck": d3.scale.linear().domain([0, 0.5, 1]).range(["#fcbba1", "#cb181d", "#67000d"]).interpolate(d3.interpolateLab),
-      "health": d3.scale.linear().domain([0, 0.5, 1]).range(["#c6dbef", "#2171b5", "#08306b"]).interpolate(d3.interpolateLab)
+      "speck": d3.scale.linear().domain([0, 0.25, 1]).range(["#737373", "#c17e84", "#ff003b"]).interpolate(d3.interpolateLab),
+      "health": d3.scale.linear().domain([0, 0.25, 1]).range(["#737373", "#7d9cc7", "#0084ff"]).interpolate(d3.interpolateLab)
     };
 
     // Set color scale for displaying the z-score
@@ -106,17 +108,17 @@
         margin_left: 10,
         margin_right: 10,
         wrap_label_width: 100,
-        line_alpha: 0.4,
+        line_alpha: 0.35,
         line_alpha_on_brushed: 0.15,
-        highlighted_line_width: 1.2,
+        highlighted_line_width: 1.1,
         axis_font_size: "12px"
       },
       health: {
         chart_min_width: available_dimensions["health"].length * 75,
         margin_left: 15,
         margin_right: 10,
-        wrap_label_width: 60,
-        line_alpha: 0.8,
+        wrap_label_width: 70,
+        line_alpha: 0.6,
         line_alpha_on_brushed: 0.15,
         highlighted_line_width: 2,
         axis_font_size: "12px"
@@ -167,7 +169,7 @@
         color_scale: ncolor_scale[mode],
         max_percentile: max_percentile,
         min_percentile: min_percentile,
-        color_opacity: 0.6,
+        color_opacity: 0.7,
         init_map_center: {
           lat: 40.4,
           lng: -80.05
@@ -225,7 +227,6 @@
         geo_heatmap.getInfoWindow().close();
         chart[mode].unhighlight();
         if (desired_mode === "speck") {
-          chart["health"].highlight(data_group_by_zipcode["health"]["all"]);
           $("#" + container_id + " .viz-health-chart-container").css("visibility", "hidden");
           $("#" + container_id + " .viz-speck-chart-container").css("visibility", "visible");
           color_scale_legend["speck"].show();
@@ -317,9 +318,6 @@
         highlighted_zipcode = undefined;
         if (typeof chart[mode] === "undefined") return;
         chart[mode].unhighlight(data_group_by_zipcode[mode][zipcode]);
-        if (mode === "health") {
-          chart["health"].highlight(data_group_by_zipcode["health"]["all"]);
-        }
       }
     }
 
@@ -476,26 +474,23 @@
       }
 
       function changeColorAndRenderChart(dimension, desired_type) {
-        chart[desired_type].svg.selectAll(".dimension")
-          .style("font-weight", "normal")
-          .filter(function (d) {
-            return d === dimension;
-          })
-          .style("font-weight", "bold");
+        var all_d = chart[desired_type].svg.selectAll(".dimension");
+        all_d.style("font-weight", "normal");
+        all_d.selectAll(".label").style("text-decoration", "none");
+        all_d.selectAll("path").style("stroke-width", "1px");
+        all_d.selectAll("line").style("stroke-width", "1px");
 
-        chart[desired_type].svg.selectAll(".dimension .label")
-          .style("text-decoration", "none")
-          .filter(function (d) {
-            return d === dimension;
-          })
-          .style("text-decoration", "underline");
+        var selected_d = all_d.filter(function (d) {
+          return d === dimension;
+        });
+        selected_d.style("font-weight", "bold");
+        selected_d.selectAll(".label").style("text-decoration", "underline");
+        selected_d.selectAll("path").style("stroke-width", "2px");
+        selected_d.selectAll("line").style("stroke-width", "2px");
 
         //chart[desired_type].color(zcolor(chart[desired_type].data(), dimension)).render();
         chart[desired_type].color(ncolor(chart[desired_type].data(), dimension)).render();
 
-        if (desired_type === "health") {
-          chart["health"].highlight(data_group_by_zipcode["health"]["all"]);
-        }
         if (typeof highlighted_zipcode !== "undefined") {
           chart[desired_type].highlight(data_group_by_zipcode[desired_type][highlighted_zipcode]);
         }
