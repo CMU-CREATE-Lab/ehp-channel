@@ -20,11 +20,13 @@
     var mode = "speck"; // "speck" means using speck data, "health" means using health data
     var current_slideshow_index;
 
-    // For normalization
-    var max_percentile = 0.95; // using quantile instead of max value when normalizing data
-    var min_percentile = 0.05; // using quantile instead of min value when normalizing data
-
-    // Set color scale for displaying the normalized value
+    // For scaling data
+    var min_output = -3; // to cap the output z-score
+    var max_output = 3; // to cap the output z-score
+    var color_scale = {
+      "speck": d3.scale.linear().domain([min_output, -2, -0.6, -0.3, 0, 0.3, 0.6, 2, max_output]).range(["#006837", "#1a9850", "#66bd63", "#a6d96a", "#cccc00", "#fdae61", "#f46d43", "#d73027", "#a50026"]).interpolate(d3.interpolateLab),
+      "health": d3.scale.linear().domain([min_output, -2, -0.6, -0.3, 0, 0.3, 0.6, 2, max_output]).range(["#006837", "#1a9850", "#66bd63", "#a6d96a", "#cccc00", "#fdae61", "#f46d43", "#d73027", "#a50026"]).interpolate(d3.interpolateLab)
+    };
     //.range(["#1ac647", "#737373", "#0084ff"]) // green to grey to blue
     //.range(["#737373", "#7d9cc7", "#0084ff"]) // grey to blue
     //.range(["#737373", "#c17e84", "#ff003b"]) // grey to red
@@ -36,20 +38,6 @@
     //.range(["#6eb1d9", "#835db9", "#810007"]) // blue to red
     //.range(["#78c679", "#31a354", "#2c7fb8", "#002d68"]) // green to blue
     //.range(["#00a511", "#fff200", "#ff6200", "#ff0000"]) // green to red
-    /*var ncolor_scale = {
-      "speck": d3.scale.linear().domain([0, 0.25, 1]).range(["#737373", "#c17e84", "#ff003b"]).interpolate(d3.interpolateLab),
-      "health": d3.scale.linear().domain([0, 0.25, 1]).range(["#737373", "#7d9cc7", "#0084ff"]).interpolate(d3.interpolateLab)
-    };*/
-    var ncolor_scale = {
-      "speck": d3.scale.linear().domain([0, 0.25, 0.75, 1]).range(["#00a511", "#fff200", "#ff6200", "#ff0000"]).interpolate(d3.interpolateLab),
-      "health": d3.scale.linear().domain([0, 0.25, 0.75, 1]).range(["#00a511", "#fff200", "#ff6200", "#ff0000"]).interpolate(d3.interpolateLab)
-    };
-
-    // Set color scale for displaying the z-score
-    /*var zcolor_scale = d3.scale.linear()
-     .domain([-1, -0.5, 0.5, 1.5])
-     .range(["#00a511", "#fff200", "#ff6200", "#ff0000"])
-     .interpolate(d3.interpolateLab);*/
 
     // Objects
     var geo_heatmap;
@@ -113,9 +101,9 @@
         margin_left: 10,
         margin_right: 10,
         wrap_label_width: 100,
-        line_alpha: 0.35,
+        line_alpha: 0.4,
         line_alpha_on_brushed: 0.15,
-        highlighted_line_width: 1.1,
+        highlighted_line_width: 1,
         axis_font_size: "12px"
       },
       health: {
@@ -123,7 +111,7 @@
         margin_left: 15,
         margin_right: 10,
         wrap_label_width: 70,
-        line_alpha: 0.6,
+        line_alpha: 0.7,
         line_alpha_on_brushed: 0.15,
         highlighted_line_width: 2,
         axis_font_size: "12px"
@@ -171,10 +159,11 @@
         zipcode_bound_info: settings["zipcode_bound_info"],
         zipcode_metadata: analysis_aggr_by_zipcode[mode][selected_dimension[mode]],
         init_map_zoom: 9,
-        color_scale: ncolor_scale[mode],
-        max_percentile: max_percentile,
-        min_percentile: min_percentile,
-        color_opacity: 0.6,
+        color_scale: color_scale[mode],
+        color_opacity: 0.7,
+        scaling_method: "zscore",
+        max_output: max_output,
+        min_output: min_output,
         init_map_center: {
           lat: 40.4,
           lng: -80.05
@@ -248,7 +237,7 @@
         }
         highlighted_zipcode = undefined;
         var desired_zipcode_metadata = analysis_aggr_by_zipcode[desired_mode][selected_dimension[desired_mode]];
-        var desired_color_scale = ncolor_scale[desired_mode];
+        var desired_color_scale = color_scale[desired_mode];
         geo_heatmap.setZipcodeMetadataAndColorScale(desired_zipcode_metadata, desired_color_scale);
         mode = desired_mode;
       }
@@ -338,7 +327,7 @@
 
       // Create object
       color_scale_legend[type] = new edaplotjs.ColorScaleLegend(legend_selector, {
-        color_scale: ncolor_scale[type]
+        color_scale: color_scale[type]
       });
     }
 
@@ -493,55 +482,30 @@
         selected_d.selectAll("path").style("stroke-width", "2px");
         selected_d.selectAll("line").style("stroke-width", "2px");
 
-        //chart[desired_type].color(zcolor(chart[desired_type].data(), dimension)).render();
-        chart[desired_type].color(ncolor(chart[desired_type].data(), dimension)).render();
+        chart[desired_type].color(colorMap(chart[desired_type].data(), dimension)).render();
 
         if (typeof highlighted_zipcode !== "undefined") {
           chart[desired_type].highlight(data_group_by_zipcode[desired_type][highlighted_zipcode]);
         }
       }
 
-      // This function is used for mapping the z-score to a color
-      /*function zcolor(col, dimension) {
-       var z = zscore(_(col).pluck(dimension).map(parseFloat));
-       return function (d) {
-       return zcolor_scale(z(d[dimension]));
-       }
-       }*/
-
-      // This function is used for mapping the normalized value to a color
-      function ncolor(col, dimension) {
-        var s = nscore(_(col).pluck(dimension).map(parseFloat));
+      // This function is used for mapping the scaled value to a color
+      function colorMap(col, dimension) {
+        var s = zscore(_(col).pluck(dimension).map(parseFloat));
         return function (d) {
-          return ncolor_scale[mode](s(d[dimension]));
+          return color_scale[mode](s(d[dimension]));
         }
       }
 
       // This function computes the z-score
-      /*function zscore(col) {
-       var mean = _(col).mean();
-       var sigma = _(col).stdDeviation();
-
-       return function (d) {
-       return (d - mean) / sigma;
-       };
-       }*/
-
-      // This function normalizes the original value between 0 to 1
-      function nscore(col) {
-        //var max_old = _(col).max();
-        //var min_old = _(col).min();
-        var all = col.sort(d3.ascending);
-        var max_old = d3.quantile(all, max_percentile);
-        var min_old = d3.quantile(all, min_percentile);
-        var max_new = 1;
-        var min_new = 0;
-        var r = (max_new - min_new) / (max_old - min_old);
+      function zscore(col) {
+        var mean = _(col).mean();
+        var sigma = _(col).stdDeviation();
 
         return function (d) {
-          var v = r * (d - min_old) + min_new;
-          if (v < min_new) v = min_new;
-          if (v > max_new) v = max_new;
+          var v = (d - mean) / sigma;
+          if (v < min_output) v = min_output;
+          if (v > max_output) v = max_output;
           return v;
         };
       }
