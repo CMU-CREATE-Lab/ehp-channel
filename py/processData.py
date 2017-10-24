@@ -21,10 +21,10 @@ def processData(fpath_in, fpath_out):
     df_h["health code"] = df_h["health code"].str.strip(" ,")
 
     # Save Speck data
-    df_s.drop(["speck name", "zipcode", "health code", "year", "month", "day"], axis=1).to_json(fpath_out[2], orient="records")
+    df_s.drop(["speck name", "zipcode", "health code", "year", "month"], axis=1, errors="ignore").to_json(fpath_out[2], orient="records")
 
     # Compute and save median of Speck analysis for each zipcode
-    df_s_gp = df_s.drop(["speck name", "health code", "year", "month", "day"], axis=1).groupby(["zipcode"])
+    df_s_gp = df_s.drop(["speck name", "health code", "year", "month"], axis=1, errors="ignore").groupby(["zipcode"])
     df_s_median = df_s_gp.median()
     df_s_median["size"] = df_s_gp.size()
     df_s_median = df_s_median[df_s_median["size"] >= 3] # sample size need > 3
@@ -37,7 +37,7 @@ def processData(fpath_in, fpath_out):
     saveJson(data_s_gp, fpath_out[4])
 
     # Compute percentage of having the symptom for each zipcode
-    df_h_gp = df_h.drop(["health code", "year", "month", "day"], axis=1).groupby(["zipcode"])
+    df_h_gp = df_h.drop(["health code", "year", "month"], axis=1, errors="ignore").groupby(["zipcode"])
     df_h_sum = df_h_gp.sum()
     df_h_size = df_h_gp.size()
     df_h_percent = df_h_sum.divide(df_h_size, axis=0)
@@ -45,7 +45,7 @@ def processData(fpath_in, fpath_out):
     df_h_percent = df_h_percent[df_h_percent["size"] >= 3] # sample size need > 3
     
     # Add percentage of having the symptom for entire dataset
-    df_h_percent_all = df_h.sum().drop(["zipcode", "health code", "year", "month", "day"]).divide(len(df_h))
+    df_h_percent_all = df_h.sum().drop(["zipcode", "health code", "year", "month"], errors="ignore").divide(len(df_h))
     df_h_percent_all["size"] = len(df_h)
     df_h_percent_all.name = "all"
     df_h_percent = df_h_percent.append(df_h_percent_all)
