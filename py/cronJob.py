@@ -9,14 +9,19 @@ def main(argv):
     p_web = "../web/data/"
 
     # Process data
-    # Generate files for visualization
+    # Generate files for visualization, fpath_in=[speck, health, story]
+    #fpath_in = [
+    #    "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=0",
+    #    "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=1153620501",
+    #    "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=2061228022"
+    #]
     fpath_in = [
-        "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=0",
-        "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=1153620501",
-        "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=2061228022"
+        "https://docs.google.com/spreadsheets/d/1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc/export?format=csv&id=1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc&gid=1789860770",
+        "https://docs.google.com/spreadsheets/d/1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc/export?format=csv&id=1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc&gid=745601240",
+        "https://docs.google.com/spreadsheets/d/1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc/export?format=csv&id=1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc&gid=26641984"
     ]
     fpath_out = [
-        p_web+"speck_median_aggr_by_zipcode.json",
+       	p_web+"speck_median_aggr_by_zipcode.json",
         p_web+"health_percent_aggr_by_zipcode.json",
         p_web+"speck_data.json",
         p_web+"health_data.json",
