@@ -8,6 +8,10 @@ def processData(fpath_in, fpath_out):
     logger.info("=====================================================================")
     logger.info("=============== START merging device and health data ================")
 
+    # Check output directories
+    for p in fpath_out:
+        checkAndCreateDir(p)
+
     # Read files
     logger.info("Read Speck information: " + fpath_in[0])
     df_s = pd.read_csv(fpath_in[0])

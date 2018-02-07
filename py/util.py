@@ -1,6 +1,6 @@
 # Python helper functions
 # Developed by Yen-Chia Hsu, hsu.yenchia@gmail.com
-# v1.0
+# v1.2
 
 import logging
 from os import listdir
@@ -13,13 +13,54 @@ import json
 import requests
 import uuid
 import pytz
+import pandas as pd
+import numpy as np
+from collections import Counter
+
+from sklearn.metrics import r2_score
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import f1_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import classification_report
+from sklearn.metrics import recall_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import precision_recall_fscore_support
+
+from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import RandomOverSampler
+
+import torch
+import scipy.ndimage as ndimage
+
+# For GA
+from apiclient.discovery import build
+from oauth2client.service_account import ServiceAccountCredentials
 
 # Generate a logger for loggin files
-def generateLogger(file_name, **options):
-    log_level = options["log_level"] if "log_level" in options else logging.INFO
+def generateLogger(file_name, log_level=logging.INFO, name=str(uuid.uuid4()),
+        format="%(asctime)s %(levelname)s %(message)s"):
     if log_level == "debug": log_level = logging.DEBUG
-    logging.basicConfig(filename=file_name, level=log_level, format="%(asctime)s %(levelname)s %(name)s %(message)s")
-    return logging.getLogger(__name__)
+    checkAndCreateDir(file_name)
+    formatter = logging.Formatter(format)
+    #handler = logging.FileHandler(file_name, mode="w") # mode "w" is for overriding file
+    handler = logging.FileHandler(file_name, mode="a")
+    handler.setFormatter(formatter)
+    logger = logging.getLogger(name)
+    logger.setLevel(log_level)
+    for hdlr in logger.handlers[:]: logger.removeHandler(hdlr) # remove old handlers
+    logger.addHandler(handler)
+    return logger
+
+# log and print
+def log(msg, logger):
+    if logger is not None:
+        logger.info(msg)
+    print msg
+
+# find the least common elements in a given array
+def findLeastCommon(arr):
+    m = Counter(arr)
+    return m.most_common()[-1][0]
 
 # Convert string to float in a safe way
 def str2float(string, **options):
@@ -31,9 +72,13 @@ def str2float(string, **options):
         else:
             return None
 
+# Check if a file exists
+def isFileHere(path):
+    return os.path.isfile(path)
+
 # Return a list of all files in a folder
-def getAllFileNamesInFolder(file_path):
-    return  [f for f in listdir(file_path) if isfile(join(file_path, f))]
+def getAllFileNamesInFolder(path):
+    return  [f for f in listdir(path) if isfile(join(path, f))]
 
 # Return the root url for ESDR
 def esdrRootUrl():
@@ -83,6 +128,14 @@ def checkAndCreateDir(path):
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
 
+# Convert the epochtime index in a pandas dataframe to datetime index
+def epochtimeIdxToDatetime(df):
+    df = df.copy(deep=True)
+    df.sort_index(inplace=True)
+    df.index = pd.to_datetime(df.index, unit="s", utc=True)
+    df.index.name = "DateTime"
+    return df
+
 # Get the base name of a file path
 def getBaseName(path, **options):
     with_extension = options["with_extension"] if "with_extension" in options else False
@@ -100,9 +153,320 @@ def getBaseName(path, **options):
 # Remove all non-ascii characters in the string
 def removeNonAsciiChars(str_in):
     if str_in is None:
-        return "None"
+        return ""
     else:
         return str(unicode(str_in.encode("utf-8"), "ascii", "ignore"))
+
+# Augment time series data
+# INPUT:
+# - df_X: 2D numpy array with shape (sample_size, feature_size, sequence_length, 1)
+# - df_Y: 1D numpy array with shape (sample_size)
+def augmentTimeSeriesData(X, Y):
+    X_new, Y_new = [], []
+    for i in range(X.shape[0]):
+        x = X[i,:,:,:]
+        X_new.append(x)
+        if Y is not None:
+            y = Y[i]
+            Y_new.append(y)
+        # Resize a small part of image
+        for kernel_size in [2]:
+            for j in range(0, int(np.floor(x.shape[1]-kernel_size+1))):
+                # Choose a block in the middle
+                before = x[:, 0:j, :]
+                block = x[:, j:j+kernel_size, :]
+                after = x[:, j+kernel_size:, :]
+                s = block.shape
+                # Make the block smaller or larger and resize the array
+                block_1 = ndimage.zoom(block, (1, 0.5, 1))
+                block_2 = ndimage.zoom(block, (1, 2, 1))
+                img_1 = np.concatenate((before, block_1, after), axis=1)
+                img_2 = np.concatenate((before, block_2, after), axis=1)
+                z_1 = float(x.shape[1]) / img_1.shape[1]
+                z_2 = float(x.shape[1]) / img_2.shape[1]
+                img_1 = ndimage.zoom(img_1, (1, z_1, 1))
+                img_2 = ndimage.zoom(img_2, (1, z_2, 1))
+                X_new.append(img_1)
+                X_new.append(img_2)
+                if Y is not None:
+                    Y_new.append(y)
+                    Y_new.append(y)
+        if i % 1000 == 0:
+            print "Augment data: i = " + str(i)
+    X_new = np.array(X_new)
+    Y_new = np.array(Y_new)
+    return X_new, Y_new
+
+# Compute time series batches from a 2D numpy array
+# INPUT:
+# - X: 2D numpy array with shape (sample_size, feature_size)
+# - Y: 2D numpy array with shape (sample_size, label_size)
+# - sequence_length: the number of data points to look back
+# - index_filter: 1D numpy boolean array, (only process and return the indices that has filter value True)
+# OUTPUT:
+# - X: 3D numpy array with shape (num_of_mini_batches, sequence_length, feature_size)
+# - Y: 1D numpy array with shape (num_of_mini_batches)
+def computeTimeSeriesBatches(X, Y, sequence_length, index_filter=None):
+    data_X = []
+    data_Y = []
+    index_all = np.array(range(sequence_length, X.shape[0]))
+    if index_filter is not None:
+        index_filter = np.array(index_filter[sequence_length:])
+        index_all = index_all[index_filter]
+    for i in index_all:
+        data_X.append(X[i-sequence_length+1:i+1])
+        if Y is not None: data_Y.append(Y[i])
+    data_X = np.array(data_X)
+    data_Y = np.array(data_Y)
+    return data_X, data_Y
+
+# Compute a custom metric for evaluating the regression function
+# Notice that for daytime cases, the Y arrays may contain NaN
+# For each smoke event, the prediction only need to hit the event at some time point
+# (for an event from 9am to 11am, good enough if there are at least one predicted event within it)
+# Denote T the 1D signal of the true data
+# Denote P the 1D signal of the predicted data
+# 1. Detect the time intervals in T and P that has values larger than a threshold "thr"
+# 2. Merge intervals that are less or equal than "h" hours away from each other
+#    (e.g., for h=1, intervals [1,3] and [4,5] need to be merged into [1,5])
+# 3. Compute the precision, recall, and f-score for each interval ...
+#    ... true positive: for each t in T, if it overlaps with a least one p in P
+#    ... false positive: for each p in P, if there is no t in T that overlaps with it
+#    ... false negative: for each t in T, if there is no p in P that overlaps with it
+def evalEventDetection(Y_true, Y_pred, thr=40, h=1, round_to_decimal=3):
+    # Convert Y_true and Y_pred into binary signals and to intervals
+    Y_true_iv, Y_pred_iv = binary2Interval(Y_true>=thr), binary2Interval(Y_pred>=thr)
+
+    # Merge intervals
+    Y_true_iv, Y_pred_iv = mergeInterval(Y_true_iv, h=h), mergeInterval(Y_pred_iv, h=h)
+
+    # Compute true positive and false negative
+    TP = 0
+    FN = 0
+    for t in Y_true_iv:
+        has_overlap = False
+        for p in Y_pred_iv:
+            # find overlaps (four possible cases)
+            c1 = t[0]<=p[0]<=t[1] and t[0]<=p[1]<=t[1]
+            c2 = p[0]<t[0] and t[0]<=p[1]<=t[1]
+            c3 = t[0]<=p[0]<=t[1] and p[1]>t[1]
+            c4 = p[0]<t[0] and p[1]>t[1]
+            if c1 or c2 or c3 or c4:
+                has_overlap = True
+                break
+        if has_overlap: TP += 1
+        else: FN += 1
+
+    # Compute false positive
+    FP = 0
+    for p in Y_pred_iv:
+        has_overlap = False
+        for t in Y_true_iv:
+            # find overlaps (four possible cases)
+            c1 = p[0]<=t[0]<=p[1] and p[0]<=t[1]<=p[1]
+            c2 = t[0]<p[0] and p[0]<=t[1]<=p[1]
+            c3 = p[0]<=t[0]<=p[1] and t[1]>p[1]
+            c4 = t[0]<p[0] and t[1]>p[1]
+            if c1 or c2 or c3 or c4:
+                has_overlap = True
+                break
+        if not has_overlap: FP += 1
+
+    # Compute precision, recall, f-score
+    TP, FN, FP = float(TP), float(FN), float(FP)
+    if TP + FP == 0: precision = 0
+    else: precision = TP / (TP + FP)
+    if TP + FN == 0: recall = 0
+    else: recall = TP / (TP + FN)
+    if precision + recall == 0: f_score = 0
+    else: f_score = 2 * (precision * recall) / (precision + recall) 
+
+    # Round to
+    precision = round(precision, round_to_decimal)
+    recall = round(recall, round_to_decimal)
+    f_score = round(f_score, round_to_decimal)
+
+    return {"TP":TP, "FP":FP, "FN":FN, "precision":precision, "recall":recall, "f_score":f_score} 
+
+# Merge intervals that are less or equal than "h" hours away from each other
+# (e.g., for h=1, intervals [1,3] and [4,5] need to be merged into [1,5])
+def mergeInterval(intervals, h=1):
+    intervals_merged = []
+    current_iv = None
+    for iv in intervals:
+        if current_iv is None:
+            current_iv = iv
+        else:
+            if iv[0] - current_iv[1] <= h:
+                current_iv[1] = iv[1]
+            else:
+                intervals_merged.append(current_iv)
+                current_iv = iv
+    if current_iv is not None:
+        intervals_merged.append(current_iv)
+    return intervals_merged
+
+# Convert a binary array with False and True to intervals
+# input = [False, True, True, False, True, False]
+# output = [[1,2], [4,4]]
+def binary2Interval(Y):
+    Y_cp = np.append(Y, False) # this is important for case like [False, True, True]
+    intervals = []
+    current_iv = None
+    for i in range(0, len(Y_cp)):
+        if Y_cp[i] and current_iv is None:
+            current_iv = [i, i]
+        if not Y_cp[i] and current_iv is not None:
+            current_iv[1] = i - 1
+            intervals.append(current_iv)
+            current_iv = None
+    return intervals
+
+# Compute the evaluation result of regression or classification Y=F(X)
+# INPUTS:
+# - Y_true: the true values of Y
+# - Y_pred: the predicted values of Y
+# - is_regr: is regression or classification
+# OUTPUT:
+# - r2: r-squared (for regression)
+# - mse: mean squared error (for regression)
+# - prf: precision, recall, and f-score (for classification) in pandas dataframe format
+# - cm: confusion matrix (for classification) in pandas dataframe format
+def computeMetric(Y_true, Y_pred, is_regr, flatten=False, simple=False,
+        round_to_decimal=3, labels=[0,1], aggr_axis=False):
+    if len(Y_true.shape) > 2: Y_true = np.reshape(Y_true, (Y_true.shape[0], -1))
+    if len(Y_pred.shape) > 2: Y_pred = np.reshape(Y_pred, (Y_pred.shape[0], -1))
+    if aggr_axis and is_regr:
+        if len(Y_true.shape) > 1:
+            Y_true = np.sum(Y_true, axis=1)
+        if len(Y_pred.shape) > 1:
+            Y_pred = np.sum(Y_pred, axis=1)
+    Y_true_origin, Y_pred_origin = deepcopy(Y_true), deepcopy(Y_pred)
+    Y_true, Y_pred = Y_true[~np.isnan(Y_true)], Y_pred[~np.isnan(Y_pred)]
+    metric = {}
+    # Compute the precision, recall, and f-score for smoke events 
+    if not simple:
+        thr = 40 if is_regr else 1
+        event_prf = evalEventDetection(Y_true_origin, Y_pred_origin, thr=thr)
+        metric["event_prf"] = event_prf 
+    if is_regr:
+        # Compute r-squared value and mean square error
+        r2 = r2_score(Y_true, Y_pred, multioutput="variance_weighted")
+        mse = mean_squared_error(Y_true, Y_pred, multioutput="uniform_average")
+        metric["r2"] = round(r2, round_to_decimal)
+        metric["mse"] = round(mse, round_to_decimal)
+    else:
+        # Compute precision, recall, fscore, and confusion matrix
+        cm = confusion_matrix(Y_true, Y_pred).round(round_to_decimal)
+        prf_class = precision_recall_fscore_support(Y_true, Y_pred, average=None)
+        prf_avg = precision_recall_fscore_support(Y_true, Y_pred, average="macro")
+        prf = []
+        idx = []
+        col = ["p", "r", "f", "s"] if simple else ["precision", "recall", "fscore", "support"]
+        for i in range(0, len(prf_class)):
+            prf.append(np.append(prf_class[i], prf_avg[i]))
+        for i in range(0, len(prf_class[0])):
+            if simple:
+                idx.append(str(i))
+            else:
+                idx.append("class_" + str(i))
+        prf[-1][-1] = np.sum(prf_class[3])
+        prf = np.array(prf).astype(float).round(round_to_decimal).T
+        idx_avg = "avg" if simple else "average"
+        df_prf = pd.DataFrame(data=prf, index=np.append(idx, idx_avg), columns=col)
+        df_cm = pd.DataFrame(data=cm, index=idx, columns=idx)
+        df_cm.index = ("t" + df_cm.index) if simple else ("true_" + df_cm.index)
+        df_cm.columns = ("p" + df_cm.columns) if simple else ("predicted_" + df_cm.columns)
+        metric["prf"] = df_prf
+        metric["cm"] = df_cm
+        if flatten:
+            metric["prf"] = flattenDataframe(metric["prf"])
+            metric["cm"] = flattenDataframe(metric["cm"])
+    return metric
+
+# Get wrongly and correctly classified data points
+# Only works for classification with label 0 and 1
+# INPUT:
+# - Y_true: the true values of responses (in numpy format, 1D array)
+# - Y_pred: the predicted values of responses (in numpy format, 1D array)
+# - X: the predictors (in numpy format, 2D array)
+# - col_names: the column names for creating the pandas dataframe
+# OUTPUT:
+# - true positives (tp), false positives (fp), true negatives (tn), false negatives(fn)
+def evaluateData(Y_true, Y_pred, X, col_names=None):
+    if col_names is None: col_names = map(str, range(0,X.shape[1]))
+    Y_true = np.squeeze(Y_true)
+    Y_pred = np.squeeze(Y_pred)
+    # Get index
+    idx_tp = (Y_true==1)&(Y_pred==1)
+    idx_fp = (Y_true==0)&(Y_pred==1)
+    idx_tn = (Y_true==0)&(Y_pred==0)
+    idx_fn = (Y_true==1)&(Y_pred==0)
+    # Get X
+    X_tp = X[idx_tp]
+    X_fp = X[idx_fp]
+    X_tn = X[idx_tn]
+    X_fn = X[idx_fn]
+    # Get Y
+    Y_true_tp = Y_true[idx_tp]
+    Y_true_fp = Y_true[idx_fp]
+    Y_true_tn = Y_true[idx_tn]
+    Y_true_fn = Y_true[idx_fn]
+    Y_pred_tp = Y_pred[idx_tp]
+    Y_pred_fp = Y_pred[idx_fp]
+    Y_pred_tn = Y_pred[idx_tn]
+    Y_pred_fn = Y_pred[idx_fn]
+    # Create dataframe
+    data_tp = np.insert(X_tp, 0 , [Y_true_tp, Y_pred_tp], axis=1)
+    data_fp = np.insert(X_fp, 0 , [Y_true_fp, Y_pred_fp], axis=1)
+    data_tn = np.insert(X_tn, 0 , [Y_true_tn, Y_pred_tn], axis=1)
+    data_fn = np.insert(X_fn, 0 , [Y_true_fn, Y_pred_fn], axis=1)
+    columns = ["Y_true", "Y_pred"] + list(col_names)
+    df_tp = pd.DataFrame(data=data_tp, columns=columns)
+    df_fp = pd.DataFrame(data=data_fp, columns=columns)
+    df_tn = pd.DataFrame(data=data_tn, columns=columns)
+    df_fn = pd.DataFrame(data=data_fn, columns=columns)
+    return {"tp": df_tp, "fp": df_fp, "tn": df_tn, "fn": df_fn}
+
+# Flatten a pandas dataframe
+def flattenDataframe(df):
+    df = df.stack()
+    idx = df.index.values.tolist()
+    for i in range(0, len(idx)):
+        idx[i] = ".".join(idx[i])
+    val = df.values.tolist()
+    return [idx, val]
+
+# Oversample the minority class and undersample the majority class for classification
+# INPUT:
+# - X: predictors (or features), 2D array
+# - Y: responses (or labels), 1D array
+def balanceDataset(X, Y):
+    # Check types
+    X_columns, Y_name = None, None
+    if isinstance(X, pd.DataFrame): X_columns = X.columns
+    if isinstance(Y, pd.Series): Y_name = Y.name
+    
+    # Use SMOTE algorithm
+    X = np.array(X)
+    Y = np.array(Y)
+    s = X.shape
+    if len(s) > 4:
+        print "Unable to resample a dataset with feature having more than 4 dimensions"
+        return None, None
+    if len(s) == 4: # this is the CNN case (convolutional neural network)
+        X = X.reshape(s[0], s[1]*s[2]*s[3])
+    model = SMOTE(random_state=0, n_jobs=-1, kind="svm")
+    #model = RandomOverSampler(random_state=0)
+    X_res, Y_res = model.fit_sample(X, Y)
+    if len(s) == 4:
+        X_res = X_res.reshape(X_res.shape[0], s[1], s[2], s[3])
+
+    # Revert types
+    if X_columns is not None: X_res = pd.DataFrame(data=X_res, columns=X_columns)
+    if Y_name is not None: Y_res = pd.Series(data=Y_res, name=Y_name)
+
+    return X_res, Y_res
 
 # Load json file
 def loadJson(fpath):
@@ -241,3 +605,138 @@ def uploadDataToEsdr(device_name, data_json, product_id, access_token, **options
     # Return a list of information for getting data from ESDR
     logger.info("Data uploaded")
     return [device_id, feed_id, api_key, api_key_read_only]
+
+# Get data from ESDR
+# source = [
+#    [{"feed": 27, "channel": "NO_PPB"}],
+#    [{"feed": 1, "channel": "PM25B_UG_M3"}, {"feed": 1, "channel": "PM25T_UG_M3"}]
+# ]
+# if source = [[A,B],[C]], this means that A and B will be merged 
+# start_time: starting epochtime in seconds
+# end_time: ending epochtime in seconds
+def getEsdrData(source, **options):
+    print "Get ESDR data..."
+    
+    # Url parts
+    api_url = esdrRootUrl() + "api/v1/"
+    export_para = "/export?format=csv"
+    if "start_time" in options:
+        export_para += "&from=" + str(options["start_time"])
+    if "end_time" in options:
+        export_para += "&to=" + str(options["end_time"])
+    
+    # Loop each source
+    data = []
+    for s_all in source:
+        df = None
+        for s in s_all:
+            # Read data
+            feed_para = "feeds/" + s["feed"]
+            channel_para = "/channels/" + s["channel"]
+            df_s = pd.read_csv(api_url + feed_para + channel_para + export_para)
+            df_s.set_index("EpochTime", inplace=True)
+            if df is None:
+                df = df_s
+            else:
+                # Merge column names
+                c = []
+                for k in zip(df.columns, df_s.columns):
+                    if k[0] != k[1]:
+                        c.append(k[0] + ".." + k[1])
+                    else:
+                        c.append(k[0])
+                df.columns = c
+                df_s.columns = c
+                df = pd.concat([df[~df.index.isin(df_s.index)], df_s])
+        df = df.apply(pd.to_numeric, errors="coerce") # To numeric values
+        data.append(df)
+
+    # Return
+    return data
+
+# Get smell reports data from smell PGH
+def getSmellReports(**options):
+    print "Get smell reports..."
+
+    # Url
+    api_url = smellPghRootUrl() + "api/v1/"
+    api_para = "smell_reports?"
+    api_para += "zipcodes=15221,15218,15222,15219,15201,15224,15213,15232,15206,15208,15217,15207,15260,15104"
+    #api_para += "allegheny_county_only=True"
+    api_para += "prediction_query=true" # this returns the user hash for identifying unique users
+    if "start_time" in options:
+        api_para += "&start_time=" + str(options["start_time"])
+    if "end_time" in options:
+        api_para += "&end_time=" + str(options["end_time"])
+    if "min_smell_value" in options:
+        api_para += "&min_smell_value=" + str(options["min_smell_value"])
+    if "max_smell_value" in options:
+        api_para += "&max_smell_value=" + str(options["max_smell_value"])
+
+    # Load smell reports
+    df = pd.read_json(api_url + api_para, convert_dates=False)
+    
+    # If empty, return None
+    if df.empty:
+        return None
+
+    # Wrangle text
+    df["smell_description"] = df["smell_description"].replace(np.nan, "").map(removeNonAsciiChars)
+    df["feelings_symptoms"] = df["feelings_symptoms"].replace(np.nan, "").map(removeNonAsciiChars)
+
+    # Set index and drop columns
+    df.set_index("created_at", inplace=True)
+    df.drop(["latitude", "longitude"], axis=1, inplace=True)
+
+    # Return
+    return df
+
+# Get Google Analytics data, need to obtain the client secret from Google API console first
+# see https://developers.google.com/analytics/devguides/config/mgmt/v3/authorization
+def getGA(
+    in_path="client_secrets.json", # client secret json file
+    out_path="GA/", # the path to store CSV files
+    date_info=[{"startDate":"2017-12-11", "endDate":"2017-12-12"}, {"startDate":"2018-01-10", "endDate":"2018-01-11"}],
+    view_id="ga:131141811", # obtain this ID from Google Analytics dashboard
+    metrics=[{"expression": "ga:pageviews"}],
+    metrics_col_names=["Pageviews"], # pretty names for metrics
+    dimensions=[{"name": "ga:dimension1"}, {"name": "ga:dimension4"}, {"name": "ga:dimension5"}],
+    dimensions_col_names=["UserID", "HitTimestamp", "DataTimestamp"] # pretty names for dimensions
+    ):
+    
+    print "Get Google Analytics..."
+
+    SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
+    KEY_FILE_LOCATION = in_path 
+
+    # Build the service object
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(KEY_FILE_LOCATION, SCOPES)
+    analytics = build('analytics', 'v4', credentials=credentials)
+
+    # Check if the directory exists
+    checkAndCreateDir(out_path)
+
+    # Use the Analytics Service Object to query the Analytics Reporting API V4
+    for k in date_info:
+        info = {
+            "reportRequests": [
+                {
+                    "viewId": view_id,
+                    "dateRanges": [k],
+                    "metrics": metrics,
+                    "dimensions": dimensions,
+                    "includeEmptyRows": True,
+                    "pageSize": 10000
+                }
+            ] 
+        }
+        r = analytics.reports().batchGet(body=info).execute()
+        # Parse rows and put them into a csv file
+        file_name = "tracker-from-" + k["startDate"] + "-to-" + k["endDate"] + ".csv"
+        with open(out_path + file_name, 'w') as out_file:
+            out_file.write(",".join(dimensions_col_names) + "," + ",".join(metrics_col_names) + "\n")
+            rows = r["reports"][0]["data"]["rows"]
+            for p in rows:
+                line = ",".join([",".join(p["dimensions"]), p["metrics"][0]["values"][0]])
+                out_file.write(line + "\n")
+            print "Google Analytics file created at " + out_path + file_name
