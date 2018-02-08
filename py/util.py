@@ -31,7 +31,8 @@ from imblearn.over_sampling import RandomOverSampler
 
 import scipy.ndimage as ndimage
 
-# For GA
+# For Google Analytics
+# sudo pip install --upgrade google-api-python-client
 from apiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 
