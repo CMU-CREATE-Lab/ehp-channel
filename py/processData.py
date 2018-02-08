@@ -5,19 +5,19 @@ import json
 # Process all data provided by EHP to json files
 def processData(fpath_in, fpath_out):
     logger = generateLogger("log.log")
-    logger.info("=====================================================================")
-    logger.info("=============== START merging device and health data ================")
+    log("=====================================================================", logger)
+    log("=============== START merging device and health data ================", logger)
 
     # Check output directories
     for p in fpath_out:
         checkAndCreateDir(p)
 
     # Read files
-    logger.info("Read Speck information: " + fpath_in[0])
+    log("Read Speck information: " + fpath_in[0], logger)
     df_s = pd.read_csv(fpath_in[0])
-    logger.info("Read health information: " + fpath_in[1])
+    log("Read health information: " + fpath_in[1], logger)
     df_h = pd.read_csv(fpath_in[1])
-    logger.info("Read story information: " + fpath_in[2])
+    log("Read story information: " + fpath_in[2], logger)
     df_st = pd.read_csv(fpath_in[2])
 
     # Clean up health code
@@ -105,8 +105,8 @@ def processData(fpath_in, fpath_out):
     #df = pd.DataFrame(data=data, columns=df_s.columns.tolist()+df_h.columns.tolist())
     #df.drop(["speck name", "zipcode", "health code"], axis=1).to_json(fpath_out[2], orient="records")
 
-    logger.info("=============== START merging device and health data ================")
-    logger.info("=====================================================================")
+    log("=============== START merging device and health data ================", logger)
+    log("=====================================================================", logger)
 
 def formatHistogram(df):
     hist = df.drop(["zipcode", "health code"], axis=1).apply(histogram, axis=0).fillna(0).astype(int)

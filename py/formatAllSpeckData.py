@@ -12,14 +12,14 @@ import copy
 # , and processes them into json files that are ready for uploading to ESDR
 def formatAllSpeckData(fpath_in, fpath_out):
     logger = generateLogger("log.log")
-    logger.info("=====================================================================")
-    logger.info("==================== START formating speck data =====================")
+    log("=====================================================================", logger)
+    log("==================== START formating speck data =====================", logger)
 
     # Check output directory
     checkAndCreateDir(fpath_out[0])
 
     # Obtain a list of file information that need to be processed
-    logger.info("Obtain a list of file names that need to be processed")
+    log("Obtain a list of file names that need to be processed", logger)
     fname_in_all = getAllFileNamesInFolder(fpath_in)
     fname_out_all = getAllFileNamesInFolder(fpath_out[0])
     unprocessed = []
@@ -33,29 +33,29 @@ def formatAllSpeckData(fpath_in, fpath_out):
                 fname_out_all.remove(f_out)
                 break
         if is_processed:
-            logger.info("File '" + f_in + "' has been processed")
+            log("File '" + f_in + "' has been processed", logger)
         else:
-            logger.info("Add file '" + f_in + "' into the list")
+            log("Add file '" + f_in + "' into the list", logger)
             unprocessed.append(f_in)
 
     # Start parallel processing
-    logger.info("Start parallel processing")
-    logger.info("---------------------------------------------------------------------")
+    log("Start parallel processing", logger)
+    log("---------------------------------------------------------------------", logger)
     r = Parallel(n_jobs=-2)(delayed(formatSpeckData)(fpath_in, fpath_out[0], f) for f in unprocessed)
 
     # Create a table to map the original file name and the Speck ID
     df = pd.DataFrame(data=r, columns=["Original File Name", "Speck ID or Error Message"])
     df.to_csv(fpath_out[1] + "file_name_to_speck_id (created at " + str(int(time.time())) + ").csv", index=False)
 
-    logger.info("===================== END formating speck data ======================")
-    logger.info("=====================================================================")
+    log("===================== END formating speck data ======================", logger)
+    log("=====================================================================", logger)
 
 # This function reads the raw Speck data provided by EHP
 # , and converts the data to json format for uploading to ESDR
-def formatSpeckData(fpath_in, fpath_out, fname_in):
+def formatSpeckData(fpath_in, fpath_out, fname_in, logger=None):
     r_msg = [fname_in]
 
-    # Create logger
+    # Create logger 
     logger = generateLogger("log.log")
 
     # Check file types
@@ -68,11 +68,11 @@ def formatSpeckData(fpath_in, fpath_out, fname_in):
             break
     if ftype is None:
         r_msg.append("ERROR: '" + fname_in + "' is not a plain text or excel file")
-        logger.error(r_msg[1])
+        log(r_msg[1], logger, level="error")
         return r_msg
 
     # Read file
-    logger.info("Read file " + fpath_in + fname_in)
+    log("Read file " + fpath_in + fname_in, logger)
     if ftype == valid_ftypes[0]:
         df = pd.read_csv(fpath_in + fname_in)
     else:
@@ -81,7 +81,7 @@ def formatSpeckData(fpath_in, fpath_out, fname_in):
     # Check if the file has data
     if len(df) == 0:
         r_msg.append("ERROR: '" + fname_in + "' has no data")
-        logger.error(r_msg[1])
+        log(r_msg[1], logger, level="error")
         return r_msg
 
     # This is the format for uploading data to ESDR
@@ -115,15 +115,15 @@ def formatSpeckData(fpath_in, fpath_out, fname_in):
                 break
     if not has_valid_epochtime:
         r_msg.append("ERROR: '" + fname_in + "' does not have valid epoch time format (in seconds)")
-        logger.error(r_msg[1])
+        log(r_msg[1], logger, level="error")
         return r_msg
     if not was_calibrated:
         r_msg.append("ERROR: '" + fname_in + "' was deployed before Sep 2015 (may not be calibrated)")
-        logger.error(r_msg[1])
+        log(r_msg[1], logger, level="error")
         return r_msg
     if num_of_valid_channels != len(channel_names):
         r_msg.append("ERROR: '" + fname_in + "' has duplicated or missing channels")
-        logger.error(r_msg[1])
+        log(r_msg[1], logger, level="error")
         return r_msg
     df.columns = cols_new
 
@@ -131,11 +131,11 @@ def formatSpeckData(fpath_in, fpath_out, fname_in):
     for c in channel_names:
         if not c in df.columns:
             r_msg.append("ERROR: '" + fname_in + "' does not have channel " + c)
-            logger.error(r_msg[1])
+            log(r_msg[1], logger, level="error")
             return r_msg
 
     # Format data
-    logger.info("Parsing rows in '" + fname_in + "'")
+    log("Parsing rows in '" + fname_in + "'", logger)
     selected_cols = copy.deepcopy(channel_names) # copy original column names
     selected_cols.insert(0, epochtime_name) # insert epochtime column
     df = df[selected_cols] # select columns
@@ -143,7 +143,7 @@ def formatSpeckData(fpath_in, fpath_out, fname_in):
     df.dropna(inplace=True, axis=0, how="any") # drop NaN
     if len(df) == 0:
         r_msg.append("ERROR: '" + fname_in + "' has no valid data points")
-        logger.error(r_msg[1])
+        log(r_msg[1], logger, level="error")
         return r_msg
     if len(df.columns) > len(channel_names) + 1:
         df = df.T.groupby(level=0).first().T # remove duplicate columns that have same column names
@@ -155,11 +155,11 @@ def formatSpeckData(fpath_in, fpath_out, fname_in):
     fpath_full = fpath_out + speck_id + ".json"
     try:
         saveJson(data, fpath_full)
-        logger.info("ESDR json file created in " + fpath_full)
+        log("ESDR json file created in " + fpath_full, logger)
         r_msg.append(speck_id)
         return r_msg
     except Exception as e:
         os.remove(fpath_full)
-        logger.error(e)
+        log(e, logger, level="error")
         r_msg.append(e)
         return r_msg

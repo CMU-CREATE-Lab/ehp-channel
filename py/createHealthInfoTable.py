@@ -4,11 +4,11 @@ from util import *
 # Build the health information table
 def createHealthInfoTable(fpath_in, fpath_out):
     logger = generateLogger("log.log")
-    logger.info("=====================================================================")
-    logger.info("=============== START creating health info table ====================")
+    log("=====================================================================", logger)
+    log("=============== START creating health info table ====================", logger)
 
     # Read health file provided by EHP
-    logger.info("Read the health data " + fpath_in)
+    log("Read the health data " + fpath_in, logger)
     df = pd.read_excel(fpath_in, sheet=0)
 
     # Delete and rename columns
@@ -35,5 +35,5 @@ def createHealthInfoTable(fpath_in, fpath_out):
     # Save file
     df.to_csv(fpath_out, index=False)
 
-    logger.info("================= END creating health info table ====================")
-    logger.info("=====================================================================")
+    log("================= END creating health info table ====================", logger)
+    log("=====================================================================", logger)

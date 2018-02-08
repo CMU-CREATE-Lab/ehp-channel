@@ -6,15 +6,15 @@ from util import *
 # Then outputs a table that maps zipcode, bound, and center location of the polygons
 def createZipcodeBoundInfo(fpath_in, fpath_out):
     logger = generateLogger("log.log")
-    logger.info("=====================================================================")
-    logger.info("=============== START creating zipcode-bound table ==================")
+    log("=====================================================================", logger)
+    log("=============== START creating zipcode-bound table ==================", logger)
 
     # Read the zipcode boundaries which have Specks
-    logger.info("Read the zipcode-boundary GeoJSON " + fpath_in)
+    log("Read the zipcode-boundary GeoJSON " + fpath_in, logger)
     zipcode_boundary = loadJson(fpath_in)
     
     # Compute the bound and center of each polygon
-    logger.info("Compute bounds and centers of polygons in the GeoJSON")
+    log("Compute bounds and centers of polygons in the GeoJSON", logger)
     zipcode_bound_tb = {
         "format": {"zipcode": ["min_lng", "min_lat", "max_lng", "max_lat", "center_lng", "center_lat"]},
         "data": {}
@@ -27,8 +27,8 @@ def createZipcodeBoundInfo(fpath_in, fpath_out):
         zipcode_bound_tb["data"][zipcode] = list(b) + c
 
     # Write zipcode_device_table to a file
-    logger.info("Create zipcode-bound table at " + fpath_out)
+    log("Create zipcode-bound table at " + fpath_out, logger)
     saveJson(zipcode_bound_tb, fpath_out)
 
-    logger.info("================ END creating zipcode-bound table ===================")
-    logger.info("=====================================================================")
+    log("================ END creating zipcode-bound table ===================", logger)
+    log("=====================================================================", logger)

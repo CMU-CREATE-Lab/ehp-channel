@@ -3,7 +3,7 @@ from processData import *
 from createZipcodeGeoJson import *
 from createZipcodeBoundInfo import *
 
-# This cron job is for updating the data on the environmental health channel periodically
+# This file is for updating the data on the environmental health channel periodically
 def main(argv):
     p = "../data/"
     p_web = "../web/data/"

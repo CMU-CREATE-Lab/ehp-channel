@@ -6,27 +6,27 @@ from util import *
 # Then output a GeoJSON containing only the zipcode boundaries which have Specks
 def createZipcodeGeoJson(fpath_in, fpath_out):
     logger = generateLogger("log.log")
-    logger.info("=====================================================================")
-    logger.info("================= START creating zipcode GeoJSON ====================")
+    log("=====================================================================", logger)
+    log("================= START creating zipcode GeoJSON ====================", logger)
 
     # Read data tables
-    logger.info("Read data table " + fpath_in[0])
-    logger.info("Read data table " + fpath_in[1])
+    log("Read data table " + fpath_in[0], logger)
+    log("Read data table " + fpath_in[1], logger)
     speck_data_gp_by_zipcode = loadJson(fpath_in[0])
     health_data_gp_by_zipcode = loadJson(fpath_in[1])
 
     # Find all unique zipcodes
-    logger.info("Find all unique zipcodes in the zipcode-device table")
+    log("Find all unique zipcodes in the zipcode-device table", logger)
     zipcodes_speck = speck_data_gp_by_zipcode.keys()
     zipcodes_health = health_data_gp_by_zipcode.keys()
     zipcodes_unique = list(set(zipcodes_speck + zipcodes_health))
 
     # Read the zipcode boundaries
-    logger.info("Read the zipcode boundaries " + fpath_in[2])
+    log("Read the zipcode boundaries " + fpath_in[2], logger)
     zipcode_boundary_all = loadJson(fpath_in[2])
 
     # Select only the boundaries which have Specks
-    logger.info("Select only the boundaries which have Specks")
+    log("Select only the boundaries which have Specks", logger)
     zipcode_boundary_speck = {
         "type": "FeatureCollection",
         "features": []
@@ -37,8 +37,8 @@ def createZipcodeGeoJson(fpath_in, fpath_out):
             zipcode_boundary_speck["features"].append(feature)
 
     # Write to a GeoJSON file
-    logger.info("Write the boundaries into GeoJSON file " + fpath_out)
+    log("Write the boundaries into GeoJSON file " + fpath_out, logger)
     saveJson(zipcode_boundary_speck, fpath_out)
 
-    logger.info("=================== END creating zipcode GeoJSON ====================")
-    logger.info("=====================================================================")
+    log("=================== END creating zipcode GeoJSON ====================", logger)
+    log("=====================================================================", logger)

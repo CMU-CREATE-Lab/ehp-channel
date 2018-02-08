@@ -2,14 +2,17 @@ import pandas as pd
 from util import *
 import re
 import numpy as np
-from uploadAllSpeckData import *
+from speckNameToHealthId import *
 from scipy.stats import zscore
 
 # Build the device information table
 def createDeviceInfoTable(fpath_in, fpath_out, file_type):
     logger = generateLogger("log.log")
-    logger.info("=====================================================================")
-    logger.info("=============== START creating device info table ====================")
+    log("=====================================================================", logger)
+    log("=============== START creating device info table ====================", logger)
+
+    # Check if path exists
+    checkAndCreateDir(fpath_out)
 
     # Read a list of file names
     fname_in_all = getAllFileNamesInFolder(fpath_in[0])
@@ -46,30 +49,30 @@ def createDeviceInfoTable(fpath_in, fpath_out, file_type):
         "Peak duration (mins)", "Hours between peaks",
         "Accumulation per day"]
     pd.DataFrame(data=tb, columns=col_names).to_csv(fpath_out, index=False)
-    logger.info("Device table created at " + fpath_out)
+    log("Device table created at " + fpath_out, logger)
 
-    logger.info("================= END creating device info table ====================")
-    logger.info("=====================================================================")
+    log("================= END creating device info table ====================", logger)
+    log("=====================================================================", logger)
 
 def parseOneFile(fpath_in, fname_in, file_type, usr, health, processed_speck_names, logger):
     speck_name = getBaseName(fname_in)
    
     # Return if file was processed
     if speck_name in processed_speck_names:
-        logger.info("File '" + fname_in + "' was processed before")
+        log("File '" + fname_in + "' was processed before", logger)
         return None
 
-    logger.info("Process file '" + fname_in + "'")
+    log("Process file '" + fname_in + "'", logger)
     k = findHouseIdOrSpeckNum(fname_in, file_type)
 
     # Return if no house id or Speck number is found
     if k is None:
-        logger.error("File name '" + fname_in + "' does not contain a Speck number")
+        log("File name '" + fname_in + "' does not contain a Speck number", logger, level="error")
         return None
 
     # Check if has zipcode
     if k not in usr:
-        logger.error("Speck '" + speck_name + "' has no valid zipcode")
+        log("Speck '" + speck_name + "' has no valid zipcode", logger, level="error")
         return None
     
     # The row to return
@@ -82,7 +85,7 @@ def parseOneFile(fpath_in, fname_in, file_type, usr, health, processed_speck_nam
     # between the starting time and the device given time
     zipcode = usr[k]["zipcode"]
     if len(zipcode) == 1:
-        logger.info("Speck '" + speck_name + "' has zipcode " + str(zipcode[0]))
+        log("Speck '" + speck_name + "' has zipcode " + str(zipcode[0]), logger)
         r = [speck_name, zipcode[0]]
     else:
         start_t = speck_json["data"][0][0]
@@ -94,10 +97,10 @@ def parseOneFile(fpath_in, fname_in, file_type, usr, health, processed_speck_nam
         # Check if the difference is not too large
         diff_hrs = diff_t[idx] / 3600
         if diff_hrs < 504:
-            logger.info("Speck '" + speck_name + "' has zipcode " + str(zipcode[idx]) + " with " + str(diff_hrs) + " hrs difference")
+            log("Speck '" + speck_name + "' has zipcode " + str(zipcode[idx]) + " with " + str(diff_hrs) + " hrs difference", logger)
             r = [speck_name, zipcode[idx]]
         else:
-            logger.error("Speck '" + speck_name + "' takes too long (" + str(diff_hrs) + " hrs) to start after being given")
+            log("Speck '" + speck_name + "' takes too long (" + str(diff_hrs) + " hrs) to start after being given", logger, level="error")
     if r is None: return None
 
     # Add health information
@@ -111,7 +114,7 @@ def parseOneFile(fpath_in, fname_in, file_type, usr, health, processed_speck_nam
     if s is None: return None
     r += s
     
-    logger.info("Speck '" + speck_name + "' return " + str(r))
+    log("Speck '" + speck_name + "' return " + str(r), logger)
     return r
 
 def computeSpeckStatistics(speck_json, speck_name, logger):
@@ -119,7 +122,7 @@ def computeSpeckStatistics(speck_json, speck_name, logger):
     try:
         data = np.array(speck_json["data"], dtype=float)
     except:
-        logger.error("Data type is not consistent for Speck " + speck_name)
+        log("Data type is not consistent for Speck " + speck_name, logger, level="error")
         return None
                       
     # Select the particle concentration data
@@ -129,7 +132,7 @@ def computeSpeckStatistics(speck_json, speck_name, logger):
     df_pm_valid = df_pm.dropna(axis=0, how="any", subset=["pm"])
     df_pm_valid = df_pm_valid[(df_pm_valid["pm"] >= 0) & (df_pm_valid["pm"] < 10000)]
     if len(df_pm_valid) == 0:
-        logger.error("No valid data points for Speck " + speck_name)
+        log("No valid data points for Speck " + speck_name, logger, level="error")
         return None
 
     # Correct data
@@ -186,7 +189,7 @@ def computeSpeckStatistics(speck_json, speck_name, logger):
     avg_accu_pm_per_day = pm_accu["area"].sum() / (num_days * 86400)
 
     # Return a list of speck analysis statistics
-    logger.info("Computed statistics of Speck " + speck_name)
+    log("Computed statistics of Speck " + speck_name, logger)
     s = [pm_baseline, avg_num_of_peaks_per_day,
         avg_peak_duration_in_mins, avg_hours_between_peaks,
         avg_accu_pm_per_day]
@@ -194,7 +197,7 @@ def computeSpeckStatistics(speck_json, speck_name, logger):
     return s
 
 def findHouseIdOrSpeckNum(fname_in, file_type):
-    speck_name = validateSpeckFileJSON(fname_in, generateLogger("log.log"))
+    speck_name = validateSpeckFileJSON(fname_in)
     if speck_name is None: return None
 
     if file_type == "old":
