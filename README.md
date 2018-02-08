@@ -10,6 +10,7 @@ cd data/
 mkdir geo/
 cd geo
 mv [path of the ZCTA5 json file] .
+mv [the ZCTA5 json file] zcta5.json
 cd ../../py/
 python updateChannelData.py
 ```
