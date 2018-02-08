@@ -29,7 +29,6 @@ from sklearn.metrics import precision_recall_fscore_support
 from imblearn.over_sampling import SMOTE
 from imblearn.over_sampling import RandomOverSampler
 
-import torch
 import scipy.ndimage as ndimage
 
 # For GA
