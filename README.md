@@ -7,7 +7,7 @@ First, download the ZCTA5 json file from [data.gov](https://catalog.data.gov/dat
 cd [path of the ehp-channel folder]
 mkdir data
 cd data/
-mkdir geo/
+mkdir geo
 cd geo
 mv [path of the ZCTA5 json file] .
 mv [the ZCTA5 json file] zcta5.json
