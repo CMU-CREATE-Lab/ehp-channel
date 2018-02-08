@@ -8,7 +8,7 @@ cd [path of the ehp-channel folder]
 mkdir data
 cd data/
 mkdir geo
-cd geo
+cd geo/
 mv [path of the ZCTA5 json file] .
 mv [the ZCTA5 json file] zcta5.json
 cd ../../py/
