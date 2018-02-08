@@ -13,4 +13,4 @@ mv [path of the ZCTA5 json file] .
 cd ../../py/
 python updateChannelData.py
 ```
-This will create a "data" folder in the "web" folder for the website.
+This will create a "data" folder in the "web" folder for the website. When running the python command, you will need to install all dependencies, see the libraries that I imported in the "util.py" file. Because the "util.py" file is shared with other projects, there are some libraries that are not used in this project. However, to run the code, please install all of them.
