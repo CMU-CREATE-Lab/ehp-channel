@@ -108,6 +108,15 @@ a {
   padding-left: 0;
 }
 
+.time-data-btn {
+  position: absolute;
+  left: 362px;
+  top: 10px;
+  width: auto !important;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
 .sensor-data-btn {
   position: absolute;
   left: 65px;

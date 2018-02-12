@@ -43,11 +43,13 @@
     var geo_heatmap;
     var chart = {
       speck: undefined,
-      health: undefined
+      health: undefined,
+      time: undefined
     };
     var color_scale_legend = {
       speck: undefined,
-      health: undefined
+      health: undefined,
+      time: undefined
     };
     var slideshow = [];
 
@@ -85,7 +87,8 @@
     // The title on the top-left on the map
     var title = {
       speck: "PM<sub>2.5</sub>",
-      health: "Health Symptoms"
+      health: "Health Symptoms",
+      time: "Time Range"
     };
 
     // Dimension settings
@@ -199,22 +202,30 @@
       // Add data tab buttons
       var $sensor_data_btn = $('<div class="sensor-data-btn custom-button" title="Change to sensor data tab"><div>');
       var $health_data_btn = $('<div class="health-data-btn custom-button" title="Change to health data tab"><div>');
+      var $time_data_btn = $('<div class="time-data-btn custom-button" title="Change time frame for data"><div>');
       $sensor_data_btn.html(title["speck"]);
       $health_data_btn.html(title["health"]);
+      $time_data_btn.html(title["time"]);
       $sensor_data_btn.on("click", function () {
         setMode("speck");
       });
       $health_data_btn.on("click", function () {
         setMode("health");
       });
+        
+    
       if (mode === "speck") {
         $sensor_data_btn.addClass("sensor-button-selected");
       } else if (mode === "health") {
         $health_data_btn.addClass("health-button-selected");
       }
+//      else if (mode === "health") {
+//        $health_data_btn.addClass("health-button-selected");
+//      }
       $viz_map_container.append($sensor_data_btn);
       $viz_map_container.append($health_data_btn);
-
+      $viz_map_container.append($time_data_btn);
+        
       function setMode(desired_mode) {
         if (desired_mode === mode) return;
         geo_heatmap.unhighlightZipcode();
