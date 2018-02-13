@@ -2,7 +2,7 @@
 The [Environmental Health Channel](http://envhealthchannel.org/) is an interactive web-based platform for creating and sharing environmental sensing and health data narratives. This data, shared by affected residents and collected by the [Environmental Health Project](http://www.environmentalhealthproject.org/) (EHP), includes physical and psychosocial health symptoms, particulate pollution (PM2.5) air measurements, and personal stories from residents. This tool displays this data using visualization and exploratory data analysis techniques. This enables researchers, health professionals, and the public to interactively explore and share compelling scientific evidence of local impacts of oil and gas drilling.
 
 # Usage
-First, get a [Google Map JavaScript API key](https://developers.google.com/maps/documentation/javascript/get-api-key), and replace the api key in the folowing line in the web/viz.html file.
+First, get a [Google Map JavaScript API key](https://developers.google.com/maps/documentation/javascript/get-api-key), and replace the api key in the folowing line in the /web/viz.html file.
 ```HTML
 <script src="https://maps.googleapis.com/maps/api/js?key=[YOUR API KEY]"></script>
 ```
