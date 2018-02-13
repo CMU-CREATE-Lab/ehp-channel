@@ -3,7 +3,7 @@ The [Environmental Health Channel](http://envhealthchannel.org/) is an interacti
 
 # Usage
 First, get a [Google Map JavaScript API key](https://developers.google.com/maps/documentation/javascript/get-api-key), and replace the api key in the folowing line in the web/viz.html file.
-```JavaScript
+```HTML
 <script src="https://maps.googleapis.com/maps/api/js?key=[YOUR API KEY]"></script>
 ```
 
