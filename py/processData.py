@@ -28,54 +28,96 @@ def processData(fpath_in, fpath_out):
     df_s.drop(["speck name", "zipcode", "health code", "year", "month", "period"], axis=1, errors="ignore").to_json(fpath_out[2], orient="records")
 
     # Compute and save median of Speck analysis for each zipcode
-    df_s_gp = df_s.drop(["speck name", "health code"], axis=1, errors="ignore").groupby(["zipcode"])
-    df_s_gp2 = df_s.drop(["speck name", "health code"], axis=1, errors="ignore").groupby(["zipcode", "year", "month"])
+    df_s_gp = df_s.drop(["speck name", "health code", "year", "month", "period"], axis=1, errors="ignore").groupby(["zipcode"])
+    df_s_gp2 = df_s.drop(["speck name", "health code","period"], axis=1, errors="ignore").groupby(["zipcode", "year", "month"])
     df_s_median = df_s_gp.median()
     df_s_median["size"] = df_s_gp.size()
     df_s_median = df_s_median[df_s_median["size"] >= 3] # sample size need > 3
     df_s_median.round(2).to_json(fpath_out[0], orient="columns")
 
-
+    season_dict = dict()
+    season_dict[1] = "winter"
+    season_dict[2] = "winter"
+    season_dict[3] = "spring"
+    season_dict[4] = "spring"
+    season_dict[5] = "spring"
+    season_dict[6] = "summer"
+    season_dict[7] = "summer"
+    season_dict[8] = "summer"
+    season_dict[9] = "fall"
+    season_dict[10] = "fall"
+    season_dict[11] = "fall"
+    season_dict[12] = "winter"
 
     # Group and save Speck data by zipcode
+    data_s_gp = {}
+    for key, item in df_s_gp:
 
-    data_s_gp2 = {}
+        zipcode = key
+        zipcode = int(zipcode)
+        # if (df_s_gp.isnull().sum() == 0):
+        if (zipcode not in data_s_gp.keys()):
+            data_s_gp[zipcode] = {}
+        data_s_gp[zipcode] = json.loads(item.drop(["zipcode"], axis=1).to_json(orient="records"))
+
+
+    saveJson(data_s_gp, fpath_out[0])
+
+
+
+    data_s_gp_seasons = {}
+
     for key, item in df_s_gp2:
+
+
         zipcode = int(key[0])
         year = int(key[1])
         month= int(key[2])
+        # if(df_s_gp.isnull().sum() == 0):
 
-        if(zipcode not in data_s_gp2.keys()):
-            data_s_gp2[zipcode] = {}
-
-        if(year not in data_s_gp2[key[0]].keys()):
-            data_s_gp2[zipcode][year] = {}
-
-        data_s_gp2[zipcode][year][month] = json.loads(item.drop(["zipcode", "year", "month"], axis=1).to_json(orient="records"))
+        season = season_dict[month]
+        if (month == 1):
+            year = year-1
 
 
 
+        if(year not in data_s_gp_seasons.keys()):
+            data_s_gp_seasons[year] = {}
+
+        if(season not in data_s_gp_seasons[year].keys()):
+            data_s_gp_seasons[year][season] = {}
+
+        data_s_gp_seasons[year][season][zipcode] = json.loads(item.drop(["zipcode", "year", "month"], axis=1).to_json(orient="records"))
+
+    # index = 4
+    p_web = "../web/data/"
+    for key in data_s_gp_seasons:
+        for season in data_s_gp_seasons[key]:
+            # saveJson(data_s_gp_seasons[key][season], fpath_out[index])
+            # index+=1;
+            fpath_out.append(p_web+season+"_"+str(key)+".json")
+            saveJson(data_s_gp_seasons[key][season], fpath_out[-1])
 
 
-    # print data_s_gp2
-        # data_s_gp2
-    # for key, item in df_s_gp:
-    #     # print(key)
-    #     data_s_gp[key] = json.loads(item.drop(["zipcode"], axis=1).to_json(orient="records"))
-
-    # print data_s_gp
-    saveJson(data_s_gp2, fpath_out[4])
 
     # Compute percentage of having the symptom for each zipcode
-    df_h_gp = df_h.drop(["health code", "period"], axis=1, errors="ignore").groupby(["zipcode", "year", "month"])
+    df_h_gp = df_h.drop(["health code", "year", "month"], axis=1, errors="ignore").groupby(["zipcode"])
+
     df_h_sum = df_h_gp.sum()
+
+    # print(df_h_sum2)
     df_h_size = df_h_gp.size()
+
+
     df_h_percent = df_h_sum.divide(df_h_size, axis=0)
+
+
+
     df_h_percent["size"] = df_h_size
     df_h_percent = df_h_percent[df_h_percent["size"] >= 3] # sample size need > 3
     
     # Add percentage of having the symptom for entire dataset
-    df_h_percent_all = df_h.sum().drop(["zipcode", "health code", "year", "month", "period"], errors="ignore").divide(len(df_h))
+    df_h_percent_all = df_h.sum().drop(["zipcode", "health code", "year", "month"], errors="ignore").divide(len(df_h))
     df_h_percent_all["size"] = len(df_h)
     df_h_percent_all.name = "all"
     df_h_percent = df_h_percent.append(df_h_percent_all)
@@ -86,29 +128,9 @@ def processData(fpath_in, fpath_out):
     df_h_percent.to_json(fpath_out[3], orient="records")
     df_h_percent_gp = {}
     for idx, row in df_h_percent.iterrows():
-        print(idx)
-        if(idx == "all"):
-            df_h_percent_gp[idx] = [json.loads(row.to_json(orient="columns"))]
-        else:
-            zipcode = int(idx[0])
-            year = int(idx[1])
-            month = int(idx[2])
-
-            if (zipcode not in data_s_gp2.keys()):
-                df_h_percent_gp[zipcode] = {}
-
-            if (year not in data_s_gp2[zipcode].keys()):
-                df_h_percent_gp[zipcode][year] = {}
-
-            df_h_percent_gp[zipcode][year][month] = json.loads(
-                row.drop(["zipcode", "year", "month"], axis=1).to_json(orient="columns"))
-
-
-
-        # df_h_percent_gp[idx] = [json.loads(row.to_json(orient="columns"))]
-
-    print(df_h_percent_gp)
-    saveJson(df_h_percent_gp, fpath_out[5])
+        # print(idx)
+        df_h_percent_gp[idx] = [json.loads(row.to_json(orient="columns"))]
+    saveJson(df_h_percent_gp, fpath_out[3])
 
     # Process and save story information
     data_st = []
@@ -134,7 +156,7 @@ def processData(fpath_in, fpath_out):
             elif ct == "title":
                 story["title"] = row.get("source1")
         data_st.append(story)
-    saveJson(data_st, fpath_out[6])
+    saveJson(data_st, fpath_out[4])
 
     # Compute and save histogram of data
     #saveJson(formatHistogram(df_h), fpath_out[3])

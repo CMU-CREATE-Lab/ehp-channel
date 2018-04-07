@@ -202,7 +202,20 @@
       // Add data tab buttons
       var $sensor_data_btn = $('<div class="sensor-data-btn custom-button" title="Change to sensor data tab"><div>');
       var $health_data_btn = $('<div class="health-data-btn custom-button" title="Change to health data tab"><div>');
-      var $time_data_btn = $('<div class="time-data-btn custom-button" title="Change time frame for data"><div>');
+      var $time_data_btn = $('<div class="time-data-btn custom-button" title="Change time frame for data"></div>');
+      var $menu = $('<div class="time-data-menu">'+
+                             '<a href> December 2014</a>'+
+                             '<a href>Spring 2015</a>'+
+                             '<a href>Summer 2015</a>'+
+                             '<a href>Fall 2015</a>'+
+                             '<a href>Winter 2015</a>'+
+                             '<a href>Spring 2016</a>'+
+                             '<a href>Summer 2016</a>'+
+                             '<a href>Fall 2016</a>'+
+                             '<a href>Winter 2016</a>'+
+                             '</div>')
+      $viz_map_container.append($menu);
+
       $sensor_data_btn.html(title["speck"]);
       $health_data_btn.html(title["health"]);
       $time_data_btn.html(title["time"]);
@@ -211,6 +224,23 @@
       });
       $health_data_btn.on("click", function () {
         setMode("health");
+      });
+        
+      var open = false;
+      $time_data_btn.on("click", function() {
+        
+        if(open == false){
+            $menu.show();
+        }else{
+            $menu.hide();
+        }
+        open = !open;
+          
+        
+//        mode = openOptions();
+//        if(mode != null){
+//            setMode(mode);
+//        }
       });
         
     
@@ -225,6 +255,13 @@
       $viz_map_container.append($sensor_data_btn);
       $viz_map_container.append($health_data_btn);
       $viz_map_container.append($time_data_btn);
+        
+      function openOptions(){
+           $( function() {
+               $menu.menu();
+           });
+          
+      }
         
       function setMode(desired_mode) {
         if (desired_mode === mode) return;

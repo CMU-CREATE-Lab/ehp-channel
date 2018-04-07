@@ -25,9 +25,8 @@ def main(argv):
         p_web+"health_percent_aggr_by_zipcode.json",
         p_web+"speck_data.json",
         p_web+"health_data.json",
-        p_web+"speck_data_group_by_zipcode.json",
-        p_web+"health_data_group_by_zipcode.json",
-        p_web+"story_data.json"
+        p_web+"story_data.json",
+
     ]
     processData(fpath_in, fpath_out)
 

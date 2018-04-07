@@ -112,9 +112,40 @@ a {
   position: absolute;
   left: 362px;
   top: 10px;
+/*  width: 300px;*/
   width: auto !important;
   padding-left: 16px;
   padding-right: 16px;
+}
+
+.time-data-menu {
+    position: absolute;
+    left: 400px;
+    top: 50px;
+    display: none;
+    overflow: auto;
+    white-space: nowrap;
+}
+
+.time-data-menu a {
+    background-color: #eee;
+    color: black;
+    display: inherit;
+    width: 120px;
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+}
+
+.time-data-menu-content {
+    
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    
 }
 
 .sensor-data-btn {
