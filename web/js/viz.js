@@ -202,31 +202,40 @@
       // Add data tab buttons
       var $sensor_data_btn = $('<div class="sensor-data-btn custom-button" title="Change to sensor data tab"><div>');
       var $health_data_btn = $('<div class="health-data-btn custom-button" title="Change to health data tab"><div>');
-      var $time_data_btn = $('<div class="time-data-btn custom-button" title="Change time frame for data"></div>');
+      var $time_data_btn = $('<div class="time-data-btn custom-time-button" title="Change time frame for data"></div>');
       var $menu = $('<div class="time-data-menu">'+
-                             '<a href> December 2014</a>'+
-                             '<a href>Spring 2015</a>'+
-                             '<a href>Summer 2015</a>'+
-                             '<a href>Fall 2015</a>'+
-                             '<a href>Winter 2015</a>'+
-                             '<a href>Spring 2016</a>'+
-                             '<a href>Summer 2016</a>'+
-                             '<a href>Fall 2016</a>'+
-                             '<a href>Winter 2016</a>'+
+                             '<li> December 2014</li>'+
+                             '<li>Spring 2015</li>'+
+                             '<li>Summer 2015</li>'+
+                             '<li>Fall 2015</li>'+
+                             '<li>Winter 2015</li>'+
+                             '<li>Spring 2016</li>'+
+                             '<li>Summer 2016</li>'+
+                             '<li>Fall 2016</li>'+
+                             '<li>Winter 2016</li>'+
                              '</div>')
       $viz_map_container.append($menu);
 
       $sensor_data_btn.html(title["speck"]);
       $health_data_btn.html(title["health"]);
-      $time_data_btn.html(title["time"]);
+      $time_data_btn.html(title["time"]); 
+    
       $sensor_data_btn.on("click", function () {
+        $time_data_btn.show();
         setMode("speck");
       });
       $health_data_btn.on("click", function () {
+        $time_data_btn.hide();
         setMode("health");
       });
         
       var open = false;
+      $("li").on("click", function() {
+          console.log("gello");
+          var url = window.location.href  + '&cylnders=12';
+          window.location = url;
+          
+      });    
       $time_data_btn.on("click", function() {
         
         if(open == false){
@@ -236,17 +245,17 @@
         }
         open = !open;
           
-        
-//        mode = openOptions();
-//        if(mode != null){
-//            setMode(mode);
-//        }
+    
       });
+    
+   
         
     
       if (mode === "speck") {
         $sensor_data_btn.addClass("sensor-button-selected");
+        $time_data_btn.show();
       } else if (mode === "health") {
+        
         $health_data_btn.addClass("health-button-selected");
       }
 //      else if (mode === "health") {

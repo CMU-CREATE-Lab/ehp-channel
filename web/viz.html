@@ -19,7 +19,7 @@
   <script src="lib/sylvester/sylvester.js"></script>
   <script src="lib/parallel-coordinates/d3.parcoords.js"></script>
   <script src="lib/parallel-coordinates/d3.underscore.math.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjw_fWbWxQ8tTjn_R6S90HqwYCocSoYcI"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_v1sFV-xzNf1avohIvUo9v9Fw8LHRA7w"></script>
   <script src="lib/geo-heatmap/GeoHeatmap.js" type="text/javascript"></script>
   <script src="lib/slideshow/Slideshow.js" type="text/javascript"></script>
   <script src="lib/color-scale-legend/ColorScaleLegend.js" type="text/javascript"></script>
@@ -118,6 +118,8 @@
         }).fail(function (response) {
           console.log("server error when loading story_data.json:", response);
         })
+        
+        //Load 
       ).then(function () {
         init(data);
       });

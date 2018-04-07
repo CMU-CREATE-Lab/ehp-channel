@@ -24,17 +24,6 @@ def processData(fpath_in, fpath_out):
     df_s["health code"] = df_s["health code"].str.strip(" ,")
     df_h["health code"] = df_h["health code"].str.strip(" ,")
 
-    # Save Speck data
-    df_s.drop(["speck name", "zipcode", "health code", "year", "month", "period"], axis=1, errors="ignore").to_json(fpath_out[2], orient="records")
-
-    # Compute and save median of Speck analysis for each zipcode
-    df_s_gp = df_s.drop(["speck name", "health code", "year", "month", "period"], axis=1, errors="ignore").groupby(["zipcode"])
-    df_s_gp2 = df_s.drop(["speck name", "health code","period"], axis=1, errors="ignore").groupby(["zipcode", "year", "month"])
-    df_s_median = df_s_gp.median()
-    df_s_median["size"] = df_s_gp.size()
-    df_s_median = df_s_median[df_s_median["size"] >= 3] # sample size need > 3
-    df_s_median.round(2).to_json(fpath_out[0], orient="columns")
-
     season_dict = dict()
     season_dict[1] = "winter"
     season_dict[2] = "winter"
@@ -48,6 +37,50 @@ def processData(fpath_in, fpath_out):
     season_dict[10] = "fall"
     season_dict[11] = "fall"
     season_dict[12] = "winter"
+
+    # Save Speck data
+    df_s2 = df_s.drop(["speck name", "health code","period", "zipcode"], axis=1, errors="ignore").groupby(["year", "month"])
+    df_s.drop(["speck name", "zipcode", "health code", "year", "month", "period"], axis=1, errors="ignore").to_json(fpath_out[2], orient="records")
+    data_s_gp_seasons = {}
+    for key, item in df_s2:
+
+        year = int(key[0])
+        month = int(key[1])
+        # if(df_s_gp.isnull().sum() == 0):
+
+        season = season_dict[month]
+        if (month == 1):
+            year = year - 1
+
+        if (year not in data_s_gp_seasons.keys()):
+            data_s_gp_seasons[year] = {}
+
+        if (season not in data_s_gp_seasons[year].keys()):
+            data_s_gp_seasons[year][season] = {}
+
+        data_s_gp_seasons[year][season] = json.loads(item.drop(["year", "month"], axis=1).to_json(orient="records"))
+
+
+    # index = 4
+    p_web = "../web/data/"
+    for key in data_s_gp_seasons:
+        for season in data_s_gp_seasons[key]:
+
+            fpath_out.append(p_web + "speck_" + season + "_" + str(key) + ".json")
+            saveJson(data_s_gp_seasons[key][season], fpath_out[-1])
+
+
+
+
+    # Compute and save median of Speck analysis for each zipcode
+    df_s_gp = df_s.drop(["speck name", "health code", "year", "month", "period"], axis=1, errors="ignore").groupby(["zipcode"])
+    df_s_gp2 = df_s.drop(["speck name", "health code","period"], axis=1, errors="ignore").groupby(["zipcode", "year", "month"])
+    df_s_median = df_s_gp.median()
+    df_s_median["size"] = df_s_gp.size()
+    df_s_median = df_s_median[df_s_median["size"] >= 3] # sample size need > 3
+    df_s_median.round(2).to_json(fpath_out[0], orient="columns")
+
+
 
     # Group and save Speck data by zipcode
     data_s_gp = {}
@@ -91,13 +124,17 @@ def processData(fpath_in, fpath_out):
 
     # index = 4
     p_web = "../web/data/"
+    time_periods = []
     for key in data_s_gp_seasons:
         for season in data_s_gp_seasons[key]:
             # saveJson(data_s_gp_seasons[key][season], fpath_out[index])
             # index+=1;
-            fpath_out.append(p_web+season+"_"+str(key)+".json")
+            time_periods.append("speck_median_aggr_by_zipcode_"+season+"_"+str(key)+".json")
+            fpath_out.append(p_web+"speck_median_aggr_by_zipcode_"+season+"_"+str(key)+".json")
             saveJson(data_s_gp_seasons[key][season], fpath_out[-1])
-
+    fpath_out.append(p_web+"time_periods.json")
+    print(time_periods)
+    saveJson(time_periods, fpath_out[-1])
 
 
     # Compute percentage of having the symptom for each zipcode
