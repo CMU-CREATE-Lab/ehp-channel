@@ -219,23 +219,22 @@
       $sensor_data_btn.html(title["speck"]);
       $health_data_btn.html(title["health"]);
       $time_data_btn.html(title["time"]); 
+      
     
+        
       $sensor_data_btn.on("click", function () {
         $time_data_btn.show();
         setMode("speck");
       });
       $health_data_btn.on("click", function () {
         $time_data_btn.hide();
+        $menu.hide();
+
         setMode("health");
       });
+      
         
-      var open = false;
-      $("li").on("click", function() {
-          console.log("gello");
-          var url = window.location.href  + '&cylnders=12';
-          window.location = url;
-          
-      });    
+      var open = false;   
       $time_data_btn.on("click", function() {
         
         if(open == false){
@@ -247,8 +246,12 @@
           
     
       });
-    
-   
+      $("li").on("click", function() {
+          console.log("gello");
+       
+          
+      });   
+      
         
     
       if (mode === "speck") {
@@ -256,21 +259,15 @@
         $time_data_btn.show();
       } else if (mode === "health") {
         
+        
         $health_data_btn.addClass("health-button-selected");
       }
-//      else if (mode === "health") {
-//        $health_data_btn.addClass("health-button-selected");
-//      }
+
       $viz_map_container.append($sensor_data_btn);
       $viz_map_container.append($health_data_btn);
       $viz_map_container.append($time_data_btn);
+      $viz_map_container.append($menu);
         
-      function openOptions(){
-           $( function() {
-               $menu.menu();
-           });
-          
-      }
         
       function setMode(desired_mode) {
         if (desired_mode === mode) return;

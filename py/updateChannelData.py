@@ -21,11 +21,13 @@ def main(argv):
     #     "https://docs.google.com/spreadsheets/d/1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc/export?format=csv&id=1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc&gid=26641984"
     # ] # these sheets are from EHP's google drive
     fpath_out = [
-       	p_web+"speck_median_aggr_by_zipcode.json",
-        p_web+"health_percent_aggr_by_zipcode.json",
-        p_web+"speck_data.json",
-        p_web+"health_data.json",
-        p_web+"story_data.json",
+        p_web + "speck_median_aggr_by_zipcode.json",
+        p_web + "health_percent_aggr_by_zipcode.json",
+        p_web + "speck_data.json",
+        p_web + "health_data.json",
+        p_web + "speck_data_group_by_zipcode.json",
+        p_web + "health_data_group_by_zipcode.json",
+        p_web + "story_data.json"
 
     ]
     processData(fpath_in, fpath_out)

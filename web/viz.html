@@ -77,7 +77,7 @@
           console.log("server error when loading zipcode_bound_info.json:", response);
         }),
         // Load the table that maps zipcodes and aggregated Speck analysis data
-        $.getJSON(path + "speck_median_aggr_by_zipcode.json", function (json) {
+        $.getJSON(path + "speck_median_aggr_by_zipcode_spring_2017.json", function (json) {
           data["speck_analysis_aggr_by_zipcode"] = json;
         }).fail(function (response) {
           console.log("server error when loading speck_median_aggr_by_zipcode.json:", response);
@@ -89,7 +89,7 @@
           console.log("server error when loading health_percent_aggr_by_zipcode.json:", response);
         }),
         // Load the speck data table
-        $.getJSON(path + "speck_data.json", function (json) {
+        $.getJSON(path + "speck_dataspring_2017.json", function (json) {
           data["speck_data"] = json;
         }).fail(function (response) {
           console.log("server error when loading speck_data.json:", response);
@@ -101,7 +101,7 @@
           console.log("server error when loading health_data.json:", response);
         }),
         // Load the speck data table grouped by zipcode
-        $.getJSON(path + "speck_data_group_by_zipcode.json", function (json) {
+        $.getJSON(path + "speck_data_group_by_zipcode_spring_2017.json", function (json) {
           data["speck_data_group_by_zipcode"] = json;
         }).fail(function (response) {
           console.log("server error when loading speck_data_group_by_zipcode.json:", response);
@@ -117,7 +117,16 @@
           data["story_data"] = json;
         }).fail(function (response) {
           console.log("server error when loading story_data.json:", response);
-        })
+        }),
+//        $.getJSON(path + "hello.json", function (json) {
+//          var yu = json;
+//            
+//        }).fail(function (response) {
+//          console.log("server error when loading hello.json:", response);
+//        }),
+    
+          
+        
         
         //Load 
       ).then(function () {
