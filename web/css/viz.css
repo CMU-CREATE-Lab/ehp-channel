@@ -156,6 +156,10 @@ a {
     
 }
 
+.viz {
+    display: none;
+}
+
 .sensor-data-btn {
   position: absolute;
   left: 65px;

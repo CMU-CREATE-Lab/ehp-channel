@@ -203,17 +203,22 @@
       var $sensor_data_btn = $('<div class="sensor-data-btn custom-button" title="Change to sensor data tab"><div>');
       var $health_data_btn = $('<div class="health-data-btn custom-button" title="Change to health data tab"><div>');
       var $time_data_btn = $('<div class="time-data-btn custom-time-button" title="Change time frame for data"></div>');
-      var $menu = $('<div class="time-data-menu">'+
-                             '<li> December 2014</li>'+
-                             '<li>Spring 2015</li>'+
-                             '<li>Summer 2015</li>'+
-                             '<li>Fall 2015</li>'+
-                             '<li>Winter 2015</li>'+
-                             '<li>Spring 2016</li>'+
-                             '<li>Summer 2016</li>'+
-                             '<li>Fall 2016</li>'+
-                             '<li>Winter 2016</li>'+
-                             '</div>')
+      
+        
+        
+    
+      var time_ranges = settings["time_ranges"];
+        
+      var menu_string = ""
+      for(var i = 0; i<time_ranges.length; i++){
+          var str = time_ranges[i];
+          var newstr = str.replace("_", " ").replace("_", " ")
+          var label = newstr.trim();
+          label = label.charAt(0).toUpperCase() + label.slice(1)
+          menu_string = menu_string+ "<li id='" +str+ "'>"  + label + "</li>";
+      }
+     
+      var $menu = $('<div class="time-data-menu">'+menu_string+'</div>')
       $viz_map_container.append($menu);
 
       $sensor_data_btn.html(title["speck"]);
@@ -247,7 +252,9 @@
     
       });
       $("li").on("click", function() {
-          console.log("gello");
+          console.log(this.id);
+          $(loadData(this.id));
+    
        
           
       });   

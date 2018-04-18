@@ -134,7 +134,7 @@ def processData(fpath_in, fpath_out):
     for key in data_s_gp_seasons:
         for season in data_s_gp_seasons[key]:
 
-            fpath_out.append(p_web + "speck_data" + season + "_" + str(key) + ".json")
+            fpath_out.append(p_web + "speck_data_" + season + "_" + str(key) + ".json")
             saveJson(data_s_gp_seasons[key][season], fpath_out[-1])
 
     data_s_gp_seasons = {}
@@ -172,7 +172,7 @@ def processData(fpath_in, fpath_out):
     for year in data_s_gp_seasons:
         for season in data_s_gp_seasons[year]:
 
-            time_ranges.append("speck_median_aggr_by_zipcode_" + season + "_" + str(year) + ".json")
+            time_ranges.append("_" + season + "_" + str(year))
 
             months = time_periods[season]
             queryString = 'year ==' + str(year) + '& (month == ' + months[0] + ' | month == ' + months[1] + ' | month == ' + months[2] + ')'
