@@ -19,7 +19,7 @@
   <script src="lib/sylvester/sylvester.js"></script>
   <script src="lib/parallel-coordinates/d3.parcoords.js"></script>
   <script src="lib/parallel-coordinates/d3.underscore.math.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjw_fWbWxQ8tTjn_R6S90HqwYCocSoYcI"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_v1sFV-xzNf1avohIvUo9v9Fw8LHRA7w"></script>
   <script src="lib/geo-heatmap/GeoHeatmap.js" type="text/javascript"></script>
   <script src="lib/slideshow/Slideshow.js" type="text/javascript"></script>
   <script src="lib/color-scale-legend/ColorScaleLegend.js" type="text/javascript"></script>
@@ -29,7 +29,9 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-10682694-22"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments)};
+    function gtag() {
+      dataLayer.push(arguments)
+    };
     gtag('js', new Date());
     gtag('config', 'UA-10682694-22');
   </script>
@@ -76,41 +78,29 @@
         }).fail(function (response) {
           console.log("server error when loading zipcode_bound_info.json:", response);
         }),
-        // Load the table that maps zipcodes and aggregated Speck analysis data
-        $.getJSON(path + "speck_median_aggr_by_zipcode.json", function (json) {
-          data["speck_analysis_aggr_by_zipcode"] = json;
-        }).fail(function (response) {
-          console.log("server error when loading speck_median_aggr_by_zipcode.json:", response);
-        }),
-        // Load the table that maps zipcodes and aggregated health analysis data
-        $.getJSON(path + "health_percent_aggr_by_zipcode.json", function (json) {
-          data["health_analysis_aggr_by_zipcode"] = json;
-        }).fail(function (response) {
-          console.log("server error when loading health_percent_aggr_by_zipcode.json:", response);
-        }),
-        // Load the speck data table
+        // Load the raw speck data
         $.getJSON(path + "speck_data.json", function (json) {
           data["speck_data"] = json;
         }).fail(function (response) {
           console.log("server error when loading speck_data.json:", response);
         }),
-        // Load the health data table
+        // Load the raw health data
         $.getJSON(path + "health_data.json", function (json) {
           data["health_data"] = json;
         }).fail(function (response) {
           console.log("server error when loading health_data.json:", response);
         }),
-        // Load the speck data table grouped by zipcode
-        $.getJSON(path + "speck_data_group_by_zipcode.json", function (json) {
-          data["speck_data_group_by_zipcode"] = json;
+        // Load the speck analysis data
+        $.getJSON(path + "speck_analysis.json", function (json) {
+          data["speck_analysis"] = json;
         }).fail(function (response) {
-          console.log("server error when loading speck_data_group_by_zipcode.json:", response);
+          console.log("server error when loading speck_analysis.json:", response);
         }),
-        // Load the health data table grouped by zipcode
-        $.getJSON(path + "health_data_group_by_zipcode.json", function (json) {
-          data["health_data_group_by_zipcode"] = json;
+        // Load the health analysis table
+        $.getJSON(path + "health_analysis.json", function (json) {
+          data["health_analysis"] = json;
         }).fail(function (response) {
-          console.log("server error when loading health_data_group_by_zipcode.json:", response);
+          console.log("server error when loading health_analysis.json:", response);
         }),
         // Load the story data
         $.getJSON(path + "story_data.json", function (json) {
@@ -127,17 +117,14 @@
       ehp_viz = new ehp.Viz("viz-container", {
         zipcode_bound_geoJson: data["zipcode_bound_geoJson"],
         zipcode_bound_info: data["zipcode_bound_info"],
-        speck_analysis_aggr_by_zipcode: data["speck_analysis_aggr_by_zipcode"],
-        health_analysis_aggr_by_zipcode: data["health_analysis_aggr_by_zipcode"],
+        speck_analysis: data["speck_analysis"],
+        health_analysis: data["health_analysis"],
         speck_data: data["speck_data"],
         health_data: data["health_data"],
-        speck_data_group_by_zipcode: data["speck_data_group_by_zipcode"],
-        health_data_group_by_zipcode: data["health_data_group_by_zipcode"],
         story_data: data["story_data"]
       });
     }
-
-    $(loadData);
+    $(loadData());
   </script>
 </head>
 <body>

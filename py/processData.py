@@ -1,69 +1,112 @@
 from util import *
 import pandas as pd
 import json
+from copy import deepcopy
 
 # Process all data provided by EHP to json files
 def processData(fpath_in, fpath_out):
     logger = generateLogger("log.log")
     log("=====================================================================", logger)
-    log("=============== START merging device and health data ================", logger)
-
+    log("====================== START processing data ========================", logger)
+    
     # Check output directories
     for p in fpath_out:
         checkAndCreateDir(p)
-
-    # Read files
-    log("Read Speck information: " + fpath_in[0], logger)
-    df_s = pd.read_csv(fpath_in[0])
-    log("Read health information: " + fpath_in[1], logger)
-    df_h = pd.read_csv(fpath_in[1])
-    log("Read story information: " + fpath_in[2], logger)
-    df_st = pd.read_csv(fpath_in[2])
-
-    # Clean up health code
-    df_s["health code"] = df_s["health code"].str.strip(" ,")
-    df_h["health code"] = df_h["health code"].str.strip(" ,")
-
-    # Save Speck data
-    df_s.drop(["speck name", "zipcode", "health code", "year", "month"], axis=1, errors="ignore").to_json(fpath_out[2], orient="records")
-
-    # Compute and save median of Speck analysis for each zipcode
-    df_s_gp = df_s.drop(["speck name", "health code", "year", "month"], axis=1, errors="ignore").groupby(["zipcode"])
-    df_s_median = df_s_gp.median()
-    df_s_median["size"] = df_s_gp.size()
-    df_s_median = df_s_median[df_s_median["size"] >= 3] # sample size need > 3
-    df_s_median.round(2).to_json(fpath_out[0], orient="columns")
-
-    # Group and save Speck data by zipcode
-    data_s_gp = {}
-    for key, item in df_s_gp:
-        data_s_gp[key] = json.loads(item.drop(["zipcode"], axis=1).to_json(orient="records"))
-    saveJson(data_s_gp, fpath_out[4])
-
-    # Compute percentage of having the symptom for each zipcode
-    df_h_gp = df_h.drop(["health code", "year", "month"], axis=1, errors="ignore").groupby(["zipcode"])
-    df_h_sum = df_h_gp.sum()
-    df_h_size = df_h_gp.size()
-    df_h_percent = df_h_sum.divide(df_h_size, axis=0)
-    df_h_percent["size"] = df_h_size
-    df_h_percent = df_h_percent[df_h_percent["size"] >= 3] # sample size need > 3
     
-    # Add percentage of having the symptom for entire dataset
-    df_h_percent_all = df_h.sum().drop(["zipcode", "health code", "year", "month"], errors="ignore").divide(len(df_h))
-    df_h_percent_all["size"] = len(df_h)
-    df_h_percent_all.name = "all"
-    df_h_percent = df_h_percent.append(df_h_percent_all)
+    processSpeckOrHealthData(fpath_in[0], fpath_out, logger, data_type="speck")
+    processSpeckOrHealthData(fpath_in[1], fpath_out, logger, data_type="health")
+    processStory(fpath_in[2], fpath_out, logger)
 
-    # Save health data
-    df_h_percent = df_h_percent.round(2)
-    df_h_percent.to_json(fpath_out[1], orient="columns")
-    df_h_percent.to_json(fpath_out[3], orient="records")
-    df_h_percent_gp = {}
-    for idx, row in df_h_percent.iterrows():
-        df_h_percent_gp[idx] = [json.loads(row.to_json(orient="columns"))]
-    saveJson(df_h_percent_gp, fpath_out[5])
+    log("======================== END processing data ========================", logger)
+    log("=====================================================================", logger)
 
-    # Process and save story information
+# Process speck or health data
+def processSpeckOrHealthData(fpath_in, fpath_out, logger, data_type="speck"):
+    # Read data
+    log("Read " + data_type + " information: " + fpath_in, logger)
+    df = pd.read_csv(fpath_in)
+    
+    # Map of season and month
+    month_to_season = {
+        1: "Winter",
+        2: "Winter",
+        3: "Spring",
+        4: "Spring",
+        5: "Spring",
+        6: "Summer",
+        7: "Summer",
+        8: "Summer",
+        9: "Fall",
+        10: "Fall",
+        11: "Fall",
+        12: "Winter"}
+
+    # Replace month to season
+    df["month"] = df["month"].map(month_to_season.get)
+
+    # Merge year and month to a string
+    df["season"] = df["month"].astype(str) + "_" + df["year"].astype(str)
+
+    # Add the original all data back with season="all"
+    df_tmp = deepcopy(df)
+    df_tmp["season"] = "All"
+    df = pd.concat([df, df_tmp], ignore_index=True)
+    
+    # Drop nan
+    idx = ((df["month"].isnull())|(df["year"].isnull()))&(df["season"]!="All")
+    df = df[~idx]
+
+    # Drop columns that are not used
+    df = df.drop(["house name", "year", "month" ,"health code", "indoor"], axis=1, errors="ignore")
+
+    # Group data by season
+    df_gp_season = df.groupby(["season"])
+    
+    # Save data for each season
+    data = {}
+    analysis = {}
+    for key, df_key in df_gp_season:
+        df_key_tmp = deepcopy(df_key)
+        df_key_tmp["zipcode"] = "All"
+        df_key = pd.concat([df_key, df_key_tmp], ignore_index=True)
+        # Save speck data
+        if data_type == "speck":
+            d = {}
+            df_key_gp = df_key.drop(["season"], axis=1).groupby(["zipcode"])
+            for k, df_k in df_key_gp:
+                if len(df_k) < 3: continue # we want sample size > 3
+                d[k] = df_k.drop(["zipcode"], axis=1).round(2).to_dict(orient="records")
+            if len(d.keys()) > 0: data[key] = d
+        # Save analysis data
+        df_gp_zipcode = df_key.groupby(["zipcode"])
+        if data_type == "speck":
+            df_analysis = df_gp_zipcode.median()
+        elif data_type == "health":
+            df_analysis = df_gp_zipcode.sum().astype("float64").divide(df_gp_zipcode.size(), axis=0)
+        df_analysis = df_analysis.round(2)
+        df_analysis["size"] = df_gp_zipcode.size()
+        df_analysis = df_analysis[df_analysis["size"] >= 3] # sample size need > 3
+        if len(df_analysis) <= 1: continue
+        analysis[key] = df_analysis.round(2).to_dict(orient="dict")
+        # Save health data
+        if data_type == "health":
+            d = {}
+            all_d = []
+            for idx, row in df_analysis.iterrows():
+                d[idx] = [row.to_dict()]
+                all_d.append(d[idx][0])
+            d["All"] = all_d
+            data[key] = d
+    saveJson(data, fpath_out + data_type + "_data.json")
+    saveJson(analysis, fpath_out + data_type + "_analysis.json")
+
+# Process and save story information
+def processStory(fpath_in, fpath_out, logger):
+    # Read story data
+    log("Read story information: " + fpath_in, logger)
+    df_st = pd.read_csv(fpath_in)
+
+    # Process story data
     data_st = []
     df_st_gp = df_st.groupby(["story id"])
     for key, item in df_st_gp:
@@ -87,47 +130,8 @@ def processData(fpath_in, fpath_out):
             elif ct == "title":
                 story["title"] = row.get("source1")
         data_st.append(story)
-    saveJson(data_st, fpath_out[6])
 
-    # Compute and save histogram of data
-    #saveJson(formatHistogram(df_h), fpath_out[3])
-
-    # Group and save the histogram of data by zipcode
-    #data_h_gp = {}
-    #for key, item in df_h_gp:
-    #    data_h_gp[key] = formatHistogram(item)
-    #saveJson(data_h_gp, fpath_out[5])
-
-    # Merge two data frames
-    #data = []
-    #df_h = df_h.set_index(["health code"]).drop("zipcode", axis=1)
-    #df_s.apply(lambda row: expandSpeckTableByHealthCode(row, data, df_h), axis=1)
-    #df = pd.DataFrame(data=data, columns=df_s.columns.tolist()+df_h.columns.tolist())
-    #df.drop(["speck name", "zipcode", "health code"], axis=1).to_json(fpath_out[2], orient="records")
-
-    log("=============== START merging device and health data ================", logger)
-    log("=====================================================================", logger)
-
-def formatHistogram(df):
-    hist = df.drop(["zipcode", "health code"], axis=1).apply(histogram, axis=0).fillna(0).astype(int)
-    return json.loads(hist.to_json(orient="split")) 
-
-def histogram(col):
-    row = {}
-    for idx, val in col.value_counts().iteritems():
-        row[idx] = val
-    return pd.Series(row)
-
-def expandSpeckTableByHealthCode(row, data, df_h):
-    h_id_str = row["health code"]
-    if not pd.isnull(h_id_str):
-        for h_id in h_id_str.split(","):
-            if h_id == "": continue
-            row_cp = row.copy(deep=True)
-            row_cp["health code"] = h_id
-            if h_id in df_h.index:
-                data.append(row_cp.values.tolist() + df_h.loc[h_id].values.tolist())
-            else:
-                data.append(row_cp.values.tolist())
-    else:
-        data.append(row.values.tolist())
+    # Save story data
+    fpath_out += "story_data.json"
+    log("Story information saved: " + fpath_out, logger)
+    saveJson(data_st, fpath_out)

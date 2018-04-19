@@ -108,6 +108,10 @@ a {
   padding-left: 0;
 }
 
+.viz {
+  display: none;
+}
+
 .sensor-data-btn {
   position: absolute;
   left: 65px;
@@ -222,4 +226,78 @@ a {
 
 .text-highlight {
   font-weight: bold;
+}
+
+.time-data-btn {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  background-color: black;
+  color: white;
+  font-family: 'Open Sans Condensed', sans-serif;
+  outline: none;
+  border: 1px solid #777777;
+  height: 45px;
+  cursor: pointer;
+  opacity: 0.8;
+  z-index: 1;
+  font-size: 23px;
+  line-height: 45px;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+  -khtml-user-select: none; /* Konqueror */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently not supported by any browser */
+}
+
+.time-data-menu {
+  position: absolute;
+  left: 10px;
+  bottom: 50px;
+  display: none;
+  overflow: auto;
+  white-space: nowrap;
+  max-height: 170px;
+  overflow: auto;
+}
+
+.time-data-menu li {
+  background-color: white;
+  color: black;
+  display: inherit;
+  width: 120px;
+  text-align: center;
+  padding: 9px;
+  text-decoration: none;
+  bottom: 100%;
+}
+
+.time-data-menu li:hover {
+  background-color: #eee;
+}
+
+.sensor_time_data_select {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: none;
+}
+
+.health_time_data_select {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: none;
+}
+
+.custom-select {
+  font-size: 20px;
+}
+
+.custom-select:focus {
+  outline: None;
 }
