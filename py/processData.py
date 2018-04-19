@@ -25,6 +25,10 @@ def processSpeckOrHealthData(fpath_in, fpath_out, logger, data_type="speck"):
     # Read data
     log("Read " + data_type + " information: " + fpath_in, logger)
     df = pd.read_csv(fpath_in)
+
+    # Make sure that month and year are integers
+    df["month"] = df["month"].fillna(-1).astype("int64")
+    df["year"] = df["year"].fillna(-1).astype("int64")
     
     # Map of season and month
     month_to_season = {
@@ -53,7 +57,7 @@ def processSpeckOrHealthData(fpath_in, fpath_out, logger, data_type="speck"):
     df = pd.concat([df, df_tmp], ignore_index=True)
     
     # Drop nan
-    idx = ((df["month"].isnull())|(df["year"].isnull()))&(df["season"]!="All")
+    idx = ((df["month"]==-1)|(df["year"]==-1))&(df["season"]!="All")
     df = df[~idx]
 
     # Drop columns that are not used
