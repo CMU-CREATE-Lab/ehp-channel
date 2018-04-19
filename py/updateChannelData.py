@@ -13,7 +13,7 @@ def main(argv):
     fpath_in = getGoogleSheetPath(production=False)
     fpath_out = p_web
     processData(fpath_in, fpath_out)
-    
+    return    
     # Read the GeoJSON containing all US zipcode boundaries
     # Read the table that maps Speck ID and zipcode
     # Then output a GeoJSON containing only the zipcode boundaries which have Specks
@@ -35,17 +35,15 @@ def getGoogleSheetPath(production=True):
     if production:
         # These sheets are from EHP's google drive
         fpath_in = [
-        "https://docs.google.com/spreadsheets/d/1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc/export?format=csv&id=1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc&gid=1789860770",
-        "https://docs.google.com/spreadsheets/d/1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc/export?format=csv&id=1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc&gid=745601240",
-        "https://docs.google.com/spreadsheets/d/1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc/export?format=csv&id=1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc&gid=26641984"
-        ]
+            "https://docs.google.com/spreadsheets/d/1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc/export?format=csv&id=1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc&gid=1789860770",
+            "https://docs.google.com/spreadsheets/d/1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc/export?format=csv&id=1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc&gid=745601240",
+            "https://docs.google.com/spreadsheets/d/1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc/export?format=csv&id=1ugZuLyTQoSVeeY6RtpwpSY5tpzh1r3snZ8eoyBY8bcc&gid=26641984"]
     else:
         # These sheets are from my public folder in Yen-Chia's google drive
         fpath_in = [
             "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=0",
             "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=1153620501",
-            "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=2061228022"
-        ]
+            "https://docs.google.com/spreadsheets/d/18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU/export?format=csv&id=18ZLEySsLWU2ICRWqhlolfuI9MCiADEtvv-7W7pefLZU&gid=2061228022"]
     return fpath_in
 
 if __name__ == "__main__":

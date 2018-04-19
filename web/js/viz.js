@@ -238,10 +238,15 @@
       });
       $viz_map_container.append($sensor_time_data_select);
       $viz_map_container.append($health_time_data_select);
+
       if (mode === "speck") {
-        $sensor_time_data_select.show();
+        if ($sensor_time_data_select.children().length > 1) {
+          $sensor_time_data_select.show();
+        }
       } else if (mode === "health") {
-        $health_time_data_select.show();
+        if ($health_time_data_select.children().length > 1) {
+          $health_time_data_select.show();
+        }
       }
 
       function setMode(desired_mode, force_refresh) {
@@ -256,7 +261,9 @@
           color_scale_legend["health"].hide();
           $sensor_data_btn.addClass("sensor-button-selected");
           $health_data_btn.removeClass("health-button-selected");
-          $sensor_time_data_select.show();
+          if ($sensor_time_data_select.children().length > 1) {
+            $sensor_time_data_select.show();
+          }
           $health_time_data_select.hide();
         } else if (desired_mode === "health") {
           $("#" + container_id + " .viz-speck-chart-container").css("visibility", "hidden");
@@ -266,7 +273,9 @@
           $sensor_data_btn.removeClass("sensor-button-selected");
           $health_data_btn.addClass("health-button-selected");
           $sensor_time_data_select.hide();
-          $health_time_data_select.show();
+          if ($health_time_data_select.children().length > 1) {
+            $health_time_data_select.show();
+          }
         }
         highlighted_zipcode = undefined;
         var desired_zipcode_metadata = analysis[desired_mode][season[desired_mode]][selected_dimension[desired_mode]];
