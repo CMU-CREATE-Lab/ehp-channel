@@ -219,6 +219,8 @@
       $sensor_time_data_select.on("change", function () {
         season["speck"] = this.value.replace(" ", "_");
         setMode("speck", true);
+        chart["speck"].data(data["speck"][season["speck"]]["All"]);
+        chart["speck"].render();
       });
       for (var i = 0; i < time_ranges["health"].length; i++) {
         var str = time_ranges["health"][i].replace("_", " ");
@@ -231,6 +233,8 @@
       $health_time_data_select.on("change", function () {
         season["health"] = this.value.replace(" ", "_");
         setMode("health", true);
+        chart["health"].data(data["health"][season["health"]]["All"]);
+        chart["health"].render();
       });
       $viz_map_container.append($sensor_time_data_select);
       $viz_map_container.append($health_time_data_select);
@@ -265,7 +269,7 @@
           $health_time_data_select.show();
         }
         highlighted_zipcode = undefined;
-        var desired_zipcode_metadata = analysis[desired_mode][season[mode]][selected_dimension[desired_mode]];
+        var desired_zipcode_metadata = analysis[desired_mode][season[desired_mode]][selected_dimension[desired_mode]];
         var desired_color_scale = color_scale[desired_mode];
         geo_heatmap.setZipcodeMetadataAndColorScale(desired_zipcode_metadata, desired_color_scale);
         mode = desired_mode;
