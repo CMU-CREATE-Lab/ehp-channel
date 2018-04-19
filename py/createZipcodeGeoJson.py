@@ -13,7 +13,11 @@ def createZipcodeGeoJson(fpath_in, fpath_out):
     log("Read data table " + fpath_in[0], logger)
     log("Read data table " + fpath_in[1], logger)
     speck_data_gp_by_zipcode = loadJson(fpath_in[0])
+    speck_data_gp_by_zipcode = speck_data_gp_by_zipcode["All"]
+    speck_data_gp_by_zipcode.pop("All", None)
     health_data_gp_by_zipcode = loadJson(fpath_in[1])
+    health_data_gp_by_zipcode = health_data_gp_by_zipcode["All"]
+    health_data_gp_by_zipcode.pop("All", None)
 
     # Find all unique zipcodes
     log("Find all unique zipcodes in the zipcode-device table", logger)

@@ -54,33 +54,27 @@
     var slideshow = [];
 
     // This table maps zipcodes and aggregated Speck (or health) analysis data
-    var analysis_aggr_by_zipcode = {
-      speck: settings["speck_analysis_aggr_by_zipcode"],
-      health: settings["health_analysis_aggr_by_zipcode"]
+    var analysis = {
+      speck: settings["speck_analysis"]["All"],
+      health: settings["health_analysis"]["All"]
     };
 
     // Main data tables
     var data = {
-      speck: settings["speck_data"],
-      health: settings["health_data"],
+      speck: settings["speck_data"]["All"],
+      health: settings["health_data"]["All"],
       story: settings["story_data"]
-    };
-
-    // Data tables grouped by zipcode
-    var data_group_by_zipcode = {
-      speck: settings["speck_data_group_by_zipcode"],
-      health: settings["health_data_group_by_zipcode"]
     };
 
     // Get the available dimensions
     var available_dimensions = {
-      speck: util.getFilteredKeys(analysis_aggr_by_zipcode["speck"], ["size"]),
-      health: util.getFilteredKeys(analysis_aggr_by_zipcode["health"], ["size"])
+      speck: util.getFilteredKeys(analysis["speck"], ["size"]),
+      health: util.getFilteredKeys(analysis["health"], ["size"])
     };
 
     // Set selected dimensions
     var selected_dimension = {
-      speck: available_dimensions["speck"][0],
+      speck: available_dimensions["speck"][3],
       health: available_dimensions["health"][0]
     };
 
@@ -160,7 +154,7 @@
       geo_heatmap = new edaplotjs.GeoHeatmap(map_selector, {
         zipcode_bound_geoJson: settings["zipcode_bound_geoJson"],
         zipcode_bound_info: settings["zipcode_bound_info"],
-        zipcode_metadata: analysis_aggr_by_zipcode[mode][selected_dimension[mode]],
+        zipcode_metadata: analysis[mode][selected_dimension[mode]],
         init_map_zoom: 9,
         color_scale: color_scale[mode],
         color_opacity: 0.7,
@@ -185,97 +179,56 @@
       });
       $viz_map_container.append($home_btn);
 
-      // Add terrain button
-      /*var $terrain_btn = $('<div class="terrain-btn custom-button" title="Toggle terrain view"><div>');
-       $terrain_btn.on("click", function () {
-       var $this = $(this);
-       if ($this.hasClass("button-pressed")) {
-       geo_heatmap.getGoogleMap().setMapTypeId("roadmap");
-       $this.removeClass("button-pressed");
-       } else {
-       geo_heatmap.getGoogleMap().setMapTypeId("terrain");
-       $this.addClass("button-pressed");
-       }
-       });
-       $viz_map_container.append($terrain_btn);*/
-
       // Add data tab buttons
       var $sensor_data_btn = $('<div class="sensor-data-btn custom-button" title="Change to sensor data tab"><div>');
       var $health_data_btn = $('<div class="health-data-btn custom-button" title="Change to health data tab"><div>');
-      var $time_data_btn = $('<div class="time-data-btn custom-time-button" title="Change time frame for data"></div>');
-      
-        
-        
-    
-      var time_ranges = settings["time_ranges"];
-        
-      var menu_string = ""
-      for(var i = 0; i<time_ranges.length; i++){
-          var str = time_ranges[i];
-          var newstr = str.replace("_", " ").replace("_", " ")
-          var label = newstr.trim();
-          label = label.charAt(0).toUpperCase() + label.slice(1)
-          menu_string = menu_string+ "<li id='" +str+ "'>"  + label + "</li>";
-      }
-     
-      var $menu = $('<div class="time-data-menu">'+menu_string+'</div>')
-      $viz_map_container.append($menu);
-
       $sensor_data_btn.html(title["speck"]);
       $health_data_btn.html(title["health"]);
-      $time_data_btn.html(title["time"]); 
-      
-    
-        
       $sensor_data_btn.on("click", function () {
-        $time_data_btn.show();
         setMode("speck");
       });
       $health_data_btn.on("click", function () {
-        $time_data_btn.hide();
-        $menu.hide();
-
         setMode("health");
       });
-      
-        
-      var open = false;   
-      $time_data_btn.on("click", function() {
-        
-        if(open == false){
-            $menu.show();
-        }else{
-            $menu.hide();
-        }
-        open = !open;
-          
-    
-      });
-      $("li").on("click", function() {
-          console.log(this.id);
-          $(loadData(this.id));
-    
-       
-          
-      });   
-      
-        
-    
       if (mode === "speck") {
         $sensor_data_btn.addClass("sensor-button-selected");
-        $time_data_btn.show();
       } else if (mode === "health") {
-        
-        
         $health_data_btn.addClass("health-button-selected");
       }
-
       $viz_map_container.append($sensor_data_btn);
       $viz_map_container.append($health_data_btn);
-      $viz_map_container.append($time_data_btn);
-      $viz_map_container.append($menu);
-        
-        
+
+      /*var $time_data_btn = $('<div class="time-data-btn custom-time-button" title="Change time frame for data"></div>');
+       var time_ranges = settings["time_ranges"];
+       var menu_string = ""
+       for(var i = 0; i<time_ranges.length; i++){
+       var str = time_ranges[i];
+       var newstr = str.replace("_", " ").replace("_", " ")
+       var label = newstr.trim();
+       label = label.charAt(0).toUpperCase() + label.slice(1)
+       menu_string = menu_string+ "<li id='" +str+ "'>"  + label + "</li>";
+       }
+       var $menu = $('<div class="time-data-menu">'+menu_string+'</div>')
+       $viz_map_container.append($menu);
+       $time_data_btn.html(title["time"]);
+
+       var open = false;
+       $time_data_btn.on("click", function() {
+
+       if(open == false){
+       $menu.show();
+       }else{
+       $menu.hide();
+       }
+       open = !open;
+
+       });
+       $("li").on("click", function() {
+       console.log(this.id);
+       $(loadData(this.id));
+       });
+       */
+
       function setMode(desired_mode) {
         if (desired_mode === mode) return;
         geo_heatmap.unhighlightZipcode();
@@ -297,7 +250,7 @@
           $health_data_btn.addClass("health-button-selected");
         }
         highlighted_zipcode = undefined;
-        var desired_zipcode_metadata = analysis_aggr_by_zipcode[desired_mode][selected_dimension[desired_mode]];
+        var desired_zipcode_metadata = analysis[desired_mode][selected_dimension[desired_mode]];
         var desired_color_scale = color_scale[desired_mode];
         geo_heatmap.setZipcodeMetadataAndColorScale(desired_zipcode_metadata, desired_color_scale);
         mode = desired_mode;
@@ -307,7 +260,7 @@
         var html = "";
 
         // Add description
-        var size_text = analysis_aggr_by_zipcode[mode]["size"][zipcode];
+        var size_text = analysis[mode]["size"][zipcode];
         var title;
         if (mode === "speck") {
           size_text += " Speck sensors";
@@ -326,7 +279,7 @@
 
         // Add statistics
         available_dimensions[mode].forEach(function (d) {
-          var value = analysis_aggr_by_zipcode[mode][d][zipcode];
+          var value = analysis[mode][d][zipcode];
           if (mode === "health") {
             value = util.roundTo(value * 100) + "%";
           }
@@ -348,15 +301,15 @@
 
       function onZipcodeRegionMouseover(zipcode) {
         if (zipcode !== highlighted_zipcode) {
-          chart[mode].highlight(data_group_by_zipcode[mode][zipcode]);
+          chart[mode].highlight(data[mode][zipcode]);
         }
       }
 
       function onZipcodeRegionMouseout(zipcode) {
         if (zipcode !== highlighted_zipcode) {
-          chart[mode].unhighlight(data_group_by_zipcode[mode][zipcode]);
+          chart[mode].unhighlight(data[mode][zipcode]);
           if (typeof highlighted_zipcode !== "undefined") {
-            chart[mode].highlight(data_group_by_zipcode[mode][highlighted_zipcode]);
+            chart[mode].highlight(data[mode][highlighted_zipcode]);
           }
         }
       }
@@ -364,7 +317,7 @@
       function onInfoWindowDomReady(zipcode) {
         if (typeof chart[mode] === "undefined") return;
         if (zipcode !== highlighted_zipcode) {
-          chart[mode].highlight(data_group_by_zipcode[mode][zipcode]);
+          chart[mode].highlight(data[mode][zipcode]);
           highlighted_zipcode = zipcode;
         }
       }
@@ -372,7 +325,7 @@
       function onInfoWindowCloseClick(zipcode) {
         highlighted_zipcode = undefined;
         if (typeof chart[mode] === "undefined") return;
-        chart[mode].unhighlight(data_group_by_zipcode[mode][zipcode]);
+        chart[mode].unhighlight(data[mode][zipcode]);
       }
     }
 
@@ -417,7 +370,7 @@
 
       // Create parallel coordinates
       chart[type] = d3.parcoords({
-        data: data[type],
+        data: data[type]["All"],
         margin: {
           top: margin_top,
           left: margin_left,
@@ -456,7 +409,7 @@
            }*/
           scale = d3.scale.linear().clamp(true);
           scale.range([chart_height - margin_top - margin_bottom, 0])
-            .domain(d3.extent(data[type], function (p) {
+            .domain(d3.extent(data[type]["All"], function (p) {
               return +p[d];
             }));
         } else {
@@ -515,7 +468,7 @@
         chart[desired_type].svg.selectAll(".dimension .label").on("click", function (dimension) {
           if (dimension === selected_dimension[desired_type]) return;
           changeColorAndRenderChart(dimension, desired_type);
-          geo_heatmap.setZipcodeMetadata(analysis_aggr_by_zipcode[desired_type][dimension]);
+          geo_heatmap.setZipcodeMetadata(analysis[desired_type][dimension]);
 
           var $info_window_content = $(".gm-style-iw");
           $info_window_content.find("[data-dimension='" + selected_dimension[desired_type] + "']").removeClass("text-highlight");
@@ -546,7 +499,7 @@
         chart[desired_type].color(colorMap(chart[desired_type].data(), dimension)).render();
 
         if (typeof highlighted_zipcode !== "undefined") {
-          chart[desired_type].highlight(data_group_by_zipcode[desired_type][highlighted_zipcode]);
+          chart[desired_type].highlight(data[desired_type][highlighted_zipcode]);
         }
       }
 

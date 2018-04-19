@@ -1,42 +1,68 @@
 from util import *
 import pandas as pd
 import json
+from copy import deepcopy
 
 # Process all data provided by EHP to json files
 def processData(fpath_in, fpath_out):
     logger = generateLogger("log.log")
     log("=====================================================================", logger)
-    log("=============== START merging device and health data ================", logger)
-
+    log("====================== START processing data ========================", logger)
+    
     # Check output directories
     for p in fpath_out:
         checkAndCreateDir(p)
+    
+    processSpeckOrHealthData(fpath_in[0], fpath_out, logger, data_type="speck")
+    processSpeckOrHealthData(fpath_in[1], fpath_out, logger, data_type="health")
+    processStory(fpath_in[2], fpath_out, logger)
+
+    log("======================== END processing data ========================", logger)
+    log("=====================================================================", logger)
+
+    return
 
     # Read files
-    log("Read Speck information: " + fpath_in[0], logger)
-    df_s = pd.read_csv(fpath_in[0])
     log("Read health information: " + fpath_in[1], logger)
     df_h = pd.read_csv(fpath_in[1])
-    log("Read story information: " + fpath_in[2], logger)
-    df_st = pd.read_csv(fpath_in[2])
 
     # Clean up health code
     df_s["health code"] = df_s["health code"].str.strip(" ,")
     df_h["health code"] = df_h["health code"].str.strip(" ,")
 
-    season_dict = dict()
-    season_dict[1] = "winter"
-    season_dict[2] = "winter"
-    season_dict[3] = "spring"
-    season_dict[4] = "spring"
-    season_dict[5] = "spring"
-    season_dict[6] = "summer"
-    season_dict[7] = "summer"
-    season_dict[8] = "summer"
-    season_dict[9] = "fall"
-    season_dict[10] = "fall"
-    season_dict[11] = "fall"
-    season_dict[12] = "winter"
+    # Map of season and month
+    month_to_season = {
+        1: "Winter",
+        2: "Winter",
+        3: "Spring",
+        4: "Spring",
+        5: "Spring",
+        6: "Summer",
+        7: "Summer",
+        8: "Summer",
+        9: "Fall",
+        10: "Fall",
+        11: "Fall",
+        12: "Winter"}
+
+    # Replace month to season
+    df_s["month"] = df_s["month"].map(month_to_season.get)
+
+    # Merge year and month to a string
+    df_s["season"] = df_s["month"].astype(str) + "_" + df_s["year"].astype(str)
+
+    # Add the original all data back with season="all"
+    df_s_tmp = deepcopy(df_s)
+    df_s_tmp["season"] = "All"
+    df_s = pd.concat([df_s, df_s_tmp], ignore_index=True)
+
+    # Drop columns that are not used
+    df_s = df_s.drop(["house name", "year", "month" ,"health code", "indoor"], axis=1)
+
+    # Save speck data as a dictionary
+    data_s_gp_season = df_s.groupby(["season"])
+    print data_s_gp_season
+    return
 
     # Save Speck data
     df_s2 = df_s.drop(["speck name", "health code","period", "zipcode"], axis=1, errors="ignore").groupby(["year", "month"])
@@ -51,7 +77,6 @@ def processData(fpath_in, fpath_out):
     df_s_median["size"] = df_s_gp.size()
     df_s_median = df_s_median[df_s_median["size"] >= 3] # sample size need > 3
     df_s_median.round(2).to_json(fpath_out[0], orient="columns")
-
 
     # Group and save Speck data by zipcode
     data_s_gp = {}
@@ -82,31 +107,6 @@ def processData(fpath_in, fpath_out):
         df_h_percent_gp[idx] = [json.loads(row.to_json(orient="columns"))]
     saveJson(df_h_percent_gp, fpath_out[5])
 
-    # Process and save story information
-    data_st = []
-    df_st_gp = df_st.groupby(["story id"])
-    for key, item in df_st_gp:
-        story = {
-            "latitude": None,
-            "longitude": None,
-            "title": None,
-            "slide": []
-        }
-        for idx, row in item.iterrows():
-            ct = row["content type"]
-            if ct == "slide":
-                story["slide"].append({
-                    "image": row.get("source1"),
-                    "text": row.get("source2")
-                })
-            elif ct == "latitude":
-                story["latitude"] = str2float(row.get("source1"))
-            elif ct == "longitude":
-                story["longitude"] = str2float(row.get("source1"))
-            elif ct == "title":
-                story["title"] = row.get("source1")
-        data_st.append(story)
-    saveJson(data_st, fpath_out[6])
 
     #Save data aggregted for each time period
     data_s_gp_seasons = {}
@@ -196,49 +196,112 @@ def processData(fpath_in, fpath_out):
     saveJson(time_ranges, fpath_out[-1])
 
 
+# Process speck or health data
+def processSpeckOrHealthData(fpath_in, fpath_out, logger, data_type="speck"):
+    # Read data
+    log("Read " + data_type + " information: " + fpath_in, logger)
+    df = pd.read_csv(fpath_in)
+    
+    # Map of season and month
+    month_to_season = {
+        1: "Winter",
+        2: "Winter",
+        3: "Spring",
+        4: "Spring",
+        5: "Spring",
+        6: "Summer",
+        7: "Summer",
+        8: "Summer",
+        9: "Fall",
+        10: "Fall",
+        11: "Fall",
+        12: "Winter"}
 
-    # Compute and save histogram of data
-    #saveJson(formatHistogram(df_h), fpath_out[3])
+    # Replace month to season
+    df["month"] = df["month"].map(month_to_season.get)
 
-    # Group and save the histogram of data by zipcode
-    #data_h_gp = {}
-    #for key, item in df_h_gp:
-    #    data_h_gp[key] = formatHistogram(item)
-    #saveJson(data_h_gp, fpath_out[5])
+    # Merge year and month to a string
+    df["season"] = df["month"].astype(str) + "_" + df["year"].astype(str)
 
-    # Merge two data frames
-    #data = []
-    #df_h = df_h.set_index(["health code"]).drop("zipcode", axis=1)
-    #df_s.apply(lambda row: expandSpeckTableByHealthCode(row, data, df_h), axis=1)
-    #df = pd.DataFrame(data=data, columns=df_s.columns.tolist()+df_h.columns.tolist())
-    #df.drop(["speck name", "zipcode", "health code"], axis=1).to_json(fpath_out[2], orient="records")
+    # Add the original all data back with season="all"
+    df_tmp = deepcopy(df)
+    df_tmp["season"] = "All"
+    df = pd.concat([df, df_tmp], ignore_index=True)
 
-    log("=============== START merging device and health data ================", logger)
-    log("=====================================================================", logger)
+    # Drop columns that are not used
+    df = df.drop(["house name", "year", "month" ,"health code", "indoor"], axis=1, errors="ignore")
 
-def formatHistogram(df):
-    hist = df.drop(["zipcode", "health code"], axis=1).apply(histogram, axis=0).fillna(0).astype(int)
-    return json.loads(hist.to_json(orient="split")) 
+    # Group data by season
+    df_gp_season = df.groupby(["season"])
+    
+    # Save data for each season
+    data = {}
+    analysis = {}
+    for key, df_key in df_gp_season:
+        df_key_tmp = deepcopy(df_key)
+        df_key_tmp["zipcode"] = "All"
+        df_key = pd.concat([df_key, df_key_tmp], ignore_index=True)
+        # Save speck data
+        if data_type == "speck":
+            d = {}
+            for k, df_k in df_key.drop(["season"], axis=1).groupby(["zipcode"]):
+                if data_type == "speck":
+                    d[k] = df_k.drop(["zipcode"], axis=1).round(2).to_dict(orient="records")
+            data[key] = d
+        # Save analysis data
+        df_gp_zipcode = df_key.groupby(["zipcode"])
+        if data_type == "speck":
+            df_analysis = df_gp_zipcode.median()
+        elif data_type == "health":
+            df_analysis = df_gp_zipcode.sum().astype("float64").divide(df_gp_zipcode.size(), axis=0)
+        df_analysis = df_analysis.round(2)
+        df_analysis["size"] = df_gp_zipcode.size()
+        df_analysis = df_analysis[df_analysis["size"] >= 3] # sample size need > 3
+        analysis[key] = df_analysis.round(2).to_dict(orient="dict")
+        # Save health data
+        if data_type == "health":
+            d = {}
+            all_d = []
+            for idx, row in df_analysis.iterrows():
+                d[idx] = [row.to_dict()]
+                all_d.append(d[idx][0])
+            d["All"] = all_d
+            data[key] = d
+    saveJson(data, fpath_out + data_type + "_data.json")
+    saveJson(analysis, fpath_out + data_type + "_analysis.json")
 
-def histogram(col):
-    row = {}
-    for idx, val in col.value_counts().iteritems():
-        row[idx] = val
-    return pd.Series(row)
+# Process and save story information
+def processStory(fpath_in, fpath_out, logger):
+    # Read story data
+    log("Read story information: " + fpath_in, logger)
+    df_st = pd.read_csv(fpath_in)
 
-def expandSpeckTableByHealthCode(row, data, df_h):
-    h_id_str = row["health code"]
-    if not pd.isnull(h_id_str):
-        for h_id in h_id_str.split(","):
-            if h_id == "": continue
-            row_cp = row.copy(deep=True)
-            row_cp["health code"] = h_id
-            if h_id in df_h.index:
-                data.append(row_cp.values.tolist() + df_h.loc[h_id].values.tolist())
-            else:
-                data.append(row_cp.values.tolist())
-    else:
-        data.append(row.values.tolist())
+    # Process story data
+    data_st = []
+    df_st_gp = df_st.groupby(["story id"])
+    for key, item in df_st_gp:
+        story = {
+            "latitude": None,
+            "longitude": None,
+            "title": None,
+            "slide": []
+        }
+        for idx, row in item.iterrows():
+            ct = row["content type"]
+            if ct == "slide":
+                story["slide"].append({
+                    "image": row.get("source1"),
+                    "text": row.get("source2")
+                })
+            elif ct == "latitude":
+                story["latitude"] = str2float(row.get("source1"))
+            elif ct == "longitude":
+                story["longitude"] = str2float(row.get("source1"))
+            elif ct == "title":
+                story["title"] = row.get("source1")
+        data_st.append(story)
 
-
-
+    # Save story data
+    fpath_out += "story_data.json"
+    log("Story information saved: " + fpath_out, logger)
+    saveJson(data_st, fpath_out)

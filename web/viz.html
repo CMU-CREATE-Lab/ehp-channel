@@ -29,7 +29,9 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-10682694-22"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments)};
+    function gtag() {
+      dataLayer.push(arguments)
+    };
     gtag('js', new Date());
     gtag('config', 'UA-10682694-22');
   </script>
@@ -59,10 +61,7 @@
   <script type="text/javascript">
     jQuery.support.cors = true;
 
-    function loadData(flag) {
-      if(flag == null){
-          flag = "";
-      }
+    function loadData() {
       var data = {};
       var path = "data/";
       // Start loading data simultaneously
@@ -79,132 +78,37 @@
         }).fail(function (response) {
           console.log("server error when loading zipcode_bound_info.json:", response);
         }),
-        // Load the table that maps zipcodes and aggregated Speck analysis data
-        $.getJSON(path + "speck_median_aggr_by_zipcode.json", function (json) {
-          data["speck_analysis_aggr_by_zipcode"] = json;
-        }).fail(function (response) {
-          console.log("server error when loading speck_median_aggr_by_zipcode.json:", response);
-        }),
-        // Load the table that maps zipcodes and aggregated health analysis data
-        $.getJSON(path + "health_percent_aggr_by_zipcode.json", function (json) {
-          data["health_analysis_aggr_by_zipcode"] = json;
-        }).fail(function (response) {
-          console.log("server error when loading health_percent_aggr_by_zipcode.json:", response);
-        }),
-        // Load the speck data table
+        // Load the raw speck data
         $.getJSON(path + "speck_data.json", function (json) {
-//          console.log(json);
           data["speck_data"] = json;
         }).fail(function (response) {
           console.log("server error when loading speck_data.json:", response);
         }),
-        // Load the health data table
+        // Load the raw health data
         $.getJSON(path + "health_data.json", function (json) {
           data["health_data"] = json;
         }).fail(function (response) {
           console.log("server error when loading health_data.json:", response);
         }),
-        // Load the speck data table grouped by zipcode
-        $.getJSON(path + "speck_data_group_by_zipcode.json", function (json) {
-          data["speck_data_group_by_zipcode"] = json;
+        // Load the speck analysis data
+        $.getJSON(path + "speck_analysis.json", function (json) {
+          data["speck_analysis"] = json;
         }).fail(function (response) {
-          console.log("server error when loading speck_data_group_by_zipcode.json:", response);
+          console.log("server error when loading speck_analysis.json:", response);
         }),
-        // Load the health data table grouped by zipcode
-        $.getJSON(path + "health_data_group_by_zipcode.json", function (json) {
-          data["health_data_group_by_zipcode"] = json;
+        // Load the health analysis table
+        $.getJSON(path + "health_analysis.json", function (json) {
+          data["health_analysis"] = json;
         }).fail(function (response) {
-          console.log("server error when loading health_data_group_by_zipcode.json:", response);
+          console.log("server error when loading health_analysis.json:", response);
         }),
         // Load the story data
         $.getJSON(path + "story_data.json", function (json) {
           data["story_data"] = json;
         }).fail(function (response) {
           console.log("server error when loading story_data.json:", response);
-        }),
-        $.getJSON(path + "time_ranges.json", function (json) {
-          data["time_ranges"] = json;
-          
-          
-
-        }).then(function (){
-          for(i = 0; i < data["time_ranges"].length; i++){
-             
-              var flag = data["time_ranges"][i];
-              console.log(flag)
-              $.getJSON(path + "speck_median_aggr_by_zipcode" + flag + ".json").done(function (json1) {
-                 data["speck_analysis_aggr_by_zipcode" + flag] = json1;
-                 
-                   
-                }).fail(function (response) {
-                  console.log("server error when loading speck_median_aggr_by_zipcode.json:", response);
-                });
-              
-              console.log(data["speck_analysis_aggr_by_zipcode" + flag])
-              
-              $.getJSON(path + "speck_data_group_by_zipcode" + flag + ".json").done(function (json2) {
-                  data["speck_data_group_by_zipcode" + flag] = json2;
-//                  console.log( data["speck_data_group_by_zipcode" + flag]);
-                }).fail(function (response) {
-                  console.log("server error when loading speck_data_group_by_zipcode.json:", response);
-                }),
-              
-              $.getJSON(path + "speck_data" + flag + ".json").done(function (json3) {
-                  data["speck_data" + flag] = json3;
-                  
-                }).fail(function (response) {
-                  console.log("server error when loading speck_data.json:", response);
-                });
-           
-            }  
-            
-            
-        }).fail(function (response) {
-          console.log("server error when loading time_ranges.json:", response);
-        }),
-       
-
-//        function({
-//            var i = 0;
-//            for(i = 0; i < data["time_ranges"].length; i++){
-//             
-//              var flag = data["time_ranges"][i];
-//              $.getJSON(path + "speck_median_aggr_by_zipcode" + flag + ".json").done(function (json1) {
-//                 data["speck_analysis_aggr_by_zipcode" + flag] = json1;
-//                 
-//                   
-//                }).fail(function (response) {
-//                  console.log("server error when loading speck_median_aggr_by_zipcode.json:", response);
-//                });
-//              
-//              console.log(data["speck_analysis_aggr_by_zipcode" + flag])
-//              
-//              $.getJSON(path + "speck_data_group_by_zipcode" + flag + ".json").done(function (json2) {
-//                  data["speck_data_group_by_zipcode" + flag] = json2;
-//                  console.log( data["speck_data_group_by_zipcode" + flag]);
-//                }).fail(function (response) {
-//                  console.log("server error when loading speck_data_group_by_zipcode.json:", response);
-//                }),
-//              
-//              $.getJSON(path + "speck_data" + flag + ".json").done(function (json3) {
-//                  data["speck_data" + flag] = json3;
-//                  
-//                }).fail(function (response) {
-//                  console.log("server error when loading speck_data.json:", response);
-//                });
-//            
-//        }
-//              
-//             
-//          
-//          
-//        }),
-        
-        
-        //Load 
+        })
       ).then(function () {
-          
-        
         init(data);
       });
     }
@@ -213,76 +117,17 @@
       ehp_viz = new ehp.Viz("viz-container", {
         zipcode_bound_geoJson: data["zipcode_bound_geoJson"],
         zipcode_bound_info: data["zipcode_bound_info"],
-        speck_analysis_aggr_by_zipcode: data["speck_analysis_aggr_by_zipcode"],
-        health_analysis_aggr_by_zipcode: data["health_analysis_aggr_by_zipcode"],
+        speck_analysis: data["speck_analysis"],
+        health_analysis: data["health_analysis"],
         speck_data: data["speck_data"],
         health_data: data["health_data"],
-        speck_data_group_by_zipcode: data["speck_data_group_by_zipcode"],
-        health_data_group_by_zipcode: data["health_data_group_by_zipcode"],
-        story_data: data["story_data"],
-        time_ranges: data["time_ranges"]
-        
+        story_data: data["story_data"]
       });
-      console.log(data["time_ranges"].length);
-      for(var i = 0; i < data["time_ranges"].length; i++){
-          console.log(data["time_ranges"][i]);
-          cur = data["time_ranges"][i];
-          console.log(cur);
-          console.log(data["speck_analysis_aggr_by_zipcode" + cur ])
-          console.log(data["speck_data_group_by_zipcode" + cur ]);
-          console.log(data["speck_data" + cur]);
-          hello = new ehp.Viz("viz-container" + i, {
-            zipcode_bound_geoJson: data["zipcode_bound_geoJson"],
-            zipcode_bound_info: data["zipcode_bound_info"],
-            speck_analysis_aggr_by_zipcode: data["speck_analysis_aggr_by_zipcode" + cur ],
-            health_analysis_aggr_by_zipcode: data["health_analysis_aggr_by_zipcode"],
-            speck_data: data["speck_data" + cur],
-            health_data: data["health_data"],
-            speck_data_group_by_zipcode: data["speck_data_group_by_zipcode" + cur ],
-            health_data_group_by_zipcode: data["health_data_group_by_zipcode"],
-            story_data: data["story_data"],
-            time_ranges: data["time_ranges"]
-          });
-          console.log(hello);
-          
-         
-
-          
-          
-          
-      }
     }
-
-    $(loadData(""));
+    $(loadData());
   </script>
 </head>
 <body>
-    
-    
 <div id="viz-container" class="noselect"></div>
-<div id="viz-container0" class="noselect viz"></div>
-<div id="viz-container1" class="noselect viz"></div>
-<div id="viz-container2" class="noselect viz"></div>
-<div id="viz-container3" class="noselect viz"></div>
-<div id="viz-container4" class="noselect viz"></div>
-<div id="viz-container5" class="noselect viz"></div>
-<div id="viz-container6" class="noselect viz"></div>
-<div id="viz-container7" class="noselect viz"></div>
-<div id="viz-container8" class="noselect viz"></div>
-<div id="viz-container9" class="noselect viz"></div>
-<div id="viz-container10" class="noselect viz"></div>
-<div id="viz-container11" class="noselect viz"></div>
-<div id="viz-container12" class="noselect viz"></div>
-<div id="viz-container13" class="noselect viz"></div>
-<div id="viz-container14" class="noselect viz"></div>
-<div id="viz-container15" class="noselect viz"></div>
-<div id="viz-container16" class="noselect viz"></div>
-<div id="viz-container17" class="noselect viz"></div>
-<div id="viz-container18" class="noselect viz"></div>
-<div id="viz-container19" class="noselect viz"></div>
-<div id="viz-container20" class="noselect viz"></div>
-
-    
-    
 </body>
 </html>
