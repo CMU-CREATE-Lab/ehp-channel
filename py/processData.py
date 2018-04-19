@@ -51,6 +51,10 @@ def processSpeckOrHealthData(fpath_in, fpath_out, logger, data_type="speck"):
     df_tmp = deepcopy(df)
     df_tmp["season"] = "All"
     df = pd.concat([df, df_tmp], ignore_index=True)
+    
+    # Drop nan
+    idx = ((df["month"].isnull())|(df["year"].isnull()))&(df["season"]!="All")
+    df = df[~idx]
 
     # Drop columns that are not used
     df = df.drop(["house name", "year", "month" ,"health code", "indoor"], axis=1, errors="ignore")

@@ -10,10 +10,10 @@ def main(argv):
 
     # Process data
     # Generate files for visualization, fpath_in=[speck, health, story]
-    fpath_in = getGoogleSheetPath(production=False)
+    fpath_in = getGoogleSheetPath(production=True)
     fpath_out = p_web
     processData(fpath_in, fpath_out)
-    return    
+    
     # Read the GeoJSON containing all US zipcode boundaries
     # Read the table that maps Speck ID and zipcode
     # Then output a GeoJSON containing only the zipcode boundaries which have Specks
