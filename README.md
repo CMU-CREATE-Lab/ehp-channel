@@ -42,10 +42,10 @@ Here is an example of the apache config file (with https):
     Order allow,deny
     Allow from all
   </Directory>
-SSLCertificateFile /etc/letsencrypt/live/envhealthchannel.org/cert.pem
-SSLCertificateKeyFile /etc/letsencrypt/live/envhealthchannel.org/privkey.pem
-Include /etc/letsencrypt/options-ssl-apache.conf
-SSLCertificateChainFile /etc/letsencrypt/live/envhealthchannel.org/chain.pem
+  SSLCertificateFile /etc/letsencrypt/live/envhealthchannel.org/cert.pem
+  SSLCertificateKeyFile /etc/letsencrypt/live/envhealthchannel.org/privkey.pem
+  Include /etc/letsencrypt/options-ssl-apache.conf
+  SSLCertificateChainFile /etc/letsencrypt/live/envhealthchannel.org/chain.pem
 </VirtualHost>
 
 <VirtualHost *:80>
