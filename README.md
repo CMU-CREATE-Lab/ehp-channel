@@ -55,7 +55,7 @@ Here is an example of the apache config file (with https):
   RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [L,NE,R=permanent]
 </VirtualHost>
 ```
-To add https support to the website, pleae refer to the "Setup https" section in the readme of [this repository](https://github.com/CMU-CREATE-Lab/video-labeling-tool). To periodically update the data on the channel, set a cron job:
+To add https support to the website, please refer to the "Setup https" section in the readme of [this repository](https://github.com/CMU-CREATE-Lab/video-labeling-tool). To periodically update the data on the channel, set a cron job:
 ```sh
 crontab -e
 ```
