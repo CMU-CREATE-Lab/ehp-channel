@@ -7,7 +7,7 @@ First, get a [Google Map JavaScript API key](https://developers.google.com/maps/
 <script src="https://maps.googleapis.com/maps/api/js?key=[YOUR API KEY]"></script>
 ```
 
-Then, download the ZCTA5 json file from [data.gov](https://catalog.data.gov/dataset/zip-codetabilation-area-boundaries/resource/ea476dcb-4846-4242-9fb3-d41afb13bf52). Then run the following bash commands in the terminal:
+Then, obtain the ZCTA5 json file as documented in [this project](https://github.com/jgoodall/us-maps). Then run the following bash commands in the terminal:
 ```bash
 cd [path of the ehp-channel folder]
 mkdir data
